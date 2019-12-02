@@ -14,6 +14,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/RocketChat/Rocket.Chat/raw/master/LICENSE)
 
 
+
 * [**NEW!** Help Wanted](#help-wanted)
 * [Community](#community)
 * [Mobile Apps](#mobile-apps)
@@ -444,7 +445,9 @@ Emoji provided graciously by [JoyPixels](https://www.joypixels.com/)
 
 Testing with [BrowserStack](https://www.browserstack.com)
 
+![LingoHub](https://user-images.githubusercontent.com/20868078/69438584-0dd0e880-0d24-11ea-9127-de61dcfa6cd6.png)
 
+Translations done with [LingoHub](https://www.lingohub.com)
 
 # Donate
 

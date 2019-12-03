@@ -8,7 +8,7 @@ on:
       - develop
       - master
       - release-*
-    tags:    
+    tags:
       - '[0-9]+.[0-9]+.[0-9]+'
       - '[0-9]+.[0-9]+.[0-9]+-rc.[0-9+]'
       - '[0-9]+.[0-9]+.[0-9]+-beta.[0-9+]'
@@ -16,7 +16,7 @@ on:
 env:
   CI: true
   MONGO_URL: mongodb://localhost:27017
-  TOOL_NODE_FLAGS: --max_old_space_size=3072
+  TOOL_NODE_FLAGS: --max_old_space_size=4096
 
 jobs:
   build:
@@ -24,14 +24,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-      
+
     - name: Cache node modules
       id: cache-nodemodules
       uses: actions/cache@v1
       with:
         path: node_modules
         key: ${{ runner.OS }}-node_modules-${{ hashFiles('**/package-lock.json') }}
-          
+
     - name: Cache meteor local
       uses: actions/cache@v1
       with:
@@ -127,7 +127,7 @@ jobs:
         npm install
         cd /tmp
         tar czf Rocket.Chat.test.tar.gz ./build-test
-        
+
     - name: Store build for tests
       uses: actions/upload-artifact@v1
       with:
@@ -160,11 +160,11 @@ jobs:
       with:
         name: build-test
         path: /tmp
-        
+
     - name: Decompress build
       run: |
         cd /tmp
-        tar xzf Rocket.Chat.test.tar.gz 
+        tar xzf Rocket.Chat.test.tar.gz
         cd -
 
     - name: Use Node.js ${{ matrix.node-version }}
@@ -175,14 +175,14 @@ jobs:
     - name: Setup Chrome
       run: |
         npm i chromedriver
-        
+
     - name: Configure Replica Set
       run: |
         docker exec mongo mongo --eval 'rs.initiate({_id:"rs0", members: [{"_id":1, "host":"localhost:27017"}]})'
         docker exec mongo mongo --eval 'rs.status()'
 
     - uses: actions/checkout@v1
-    
+
     - name: Cache node modules
       id: cache-nodemodules
       uses: actions/cache@v1
@@ -223,14 +223,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-      
+
     - name: Cache node modules
       id: cache-nodemodules
       uses: actions/cache@v1
       with:
         path: node_modules
         key: ${{ runner.OS }}-node_modules-${{ hashFiles('**/package-lock.json') }}
-          
+
     - name: Cache meteor local
       uses: actions/cache@v1
       with:
@@ -298,20 +298,20 @@ jobs:
     - name: Build Docker image for PRs
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: pr-${{ github.event.number }} 
+        VERSION: pr-${{ github.event.number }}
       run: |
         cd /tmp/build-pr
-        
+
         export OWNER="${GITHUB_REPOSITORY%/*}"
 
         docker login docker.pkg.github.com -u "${OWNER}" -p "${GITHUB_TOKEN}"
 
         cp $GITHUB_WORKSPACE/.docker/Dockerfile .
-        
+
         export LOWERCASE_REPOSITORY=$(echo "$GITHUB_REPOSITORY" | tr "[:upper:]" "[:lower:]")
-        
+
         export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/rocket.chat:${VERSION}"
-        
+
         echo "Build official Docker image ${IMAGE_NAME}"
 
         docker build -t $IMAGE_NAME .

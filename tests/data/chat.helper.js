@@ -6,7 +6,7 @@ export const sendSimpleMessage = ({ roomId, text = 'test message', tmid }) => {
 	}
 	const message = {
 		rid: roomId,
-		text,
+		msg: text,
 	};
 	if (tmid) {
 		message.tmid = tmid;

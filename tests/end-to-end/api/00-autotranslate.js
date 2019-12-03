@@ -278,6 +278,10 @@ describe('AutoTranslate', function() {
 					.send({
 						messageId: messageSent._id,
 					})
+					.expect((res) => {
+						console.log(messageSent._id);
+						console.log(res.body);
+					})
 					.expect('Content-Type', 'application/json')
 					.expect(200)
 					.expect((res) => {

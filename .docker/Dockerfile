@@ -5,10 +5,10 @@ ADD . /app
 MAINTAINER buildmaster@rocket.chat
 
 RUN set -x \
+ && chown -R rocketchat:rocketchat /app \
  && cd /app/bundle/programs/server \
  && npm install \
- && npm cache clear --force \
- && chown -R rocketchat:rocketchat /app
+ && npm cache clear --force
 
 USER rocketchat
 

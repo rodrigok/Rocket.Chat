@@ -3,9 +3,9 @@ import { EJSON } from 'meteor/ejson';
 
 import { API } from '../../../api/server';
 import { logger } from '../lib/logger';
-import { contextDefinitions, eventTypes } from '../../../models/server/models/FederationEvents';
+import { contextDefinitions, eventTypes } from '../../../models/server/models/Events';
 import {
-	FederationRoomEvents, FederationServers,
+	RoomEvents, FederationServers,
 	Messages,
 	Rooms,
 	Subscriptions,
@@ -50,6 +50,8 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 
 			let eventResult;
 
+			const eventContext = contextDefinitions.ROOM.context(event);
+
 			switch (event.type) {
 				//
 				// PING
@@ -64,13 +66,13 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// GENESIS
 				//
 				case eventTypes.GENESIS:
-					switch (event.data.contextType) {
+					switch (event.d.contextType) {
 						case contextDefinitions.ROOM.type:
-							eventResult = await FederationRoomEvents.addEvent(event.context, event);
+							eventResult = await RoomEvents.addEvent(eventContext, event);
 
 							// If the event was successfully added, handle the event locally
 							if (eventResult.success) {
-								const { data: { room } } = event;
+								const { d: { room } } = event;
 
 								// Check if room exists
 								const persistedRoom = Rooms.findOne({ _id: room._id });
@@ -94,7 +96,7 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_DELETE
 				//
 				case eventTypes.ROOM_DELETE:
-					const { data: { roomId } } = event;
+					const { d: { roomId } } = event;
 
 					// Check if room exists
 					const persistedRoom = Rooms.findOne({ _id: roomId });
@@ -105,7 +107,7 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 					}
 
 					// Remove all room events
-					await FederationRoomEvents.removeRoomEvents(roomId);
+					await RoomEvents.removeRoomEvents(roomId);
 
 					eventResult = {
 						success: true,
@@ -117,11 +119,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_ADD_USER
 				//
 				case eventTypes.ROOM_ADD_USER:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { roomId, user, subscription, domainsAfterAdd } } = event;
+						const { d: { roomId, user, subscription, domainsAfterAdd } } = event;
 
 						// Check if user exists
 						const persistedUser = Users.findOne({ _id: user._id });
@@ -163,11 +165,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_REMOVE_USER
 				//
 				case eventTypes.ROOM_REMOVE_USER:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { roomId, user, domainsAfterRemoval } } = event;
+						const { d: { roomId, user, domainsAfterRemoval } } = event;
 
 						// Remove the user's subscription
 						Subscriptions.removeByRoomIdAndUserId(roomId, user._id);
@@ -184,11 +186,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_MESSAGE
 				//
 				case eventTypes.ROOM_MESSAGE:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { message } } = event;
+						const { d: { message } } = event;
 
 						// Check if message exists
 						const persistedMessage = Messages.findOne({ _id: message._id });
@@ -207,9 +209,9 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 							if (denormalizedMessage.file) {
 								const fileStore = FileUpload.getStore('Uploads');
 
-								const { federation: { origin } } = denormalizedMessage;
+								const { src } = denormalizedMessage;
 
-								const { upload, buffer } = getUpload(origin, denormalizedMessage.file._id);
+								const { upload, buffer } = getUpload(src, denormalizedMessage.file._id);
 
 								const oldUploadId = upload._id;
 
@@ -219,7 +221,7 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 								upload.userId = denormalizedMessage.u._id;
 								upload.federation = {
 									_id: denormalizedMessage.file._id,
-									origin,
+									src,
 								};
 
 								Meteor.runAsUser(upload.userId, () => Meteor.wrapAsync(fileStore.insert.bind(fileStore))(upload, buffer));
@@ -248,11 +250,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_EDIT_MESSAGE
 				//
 				case eventTypes.ROOM_EDIT_MESSAGE:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { message } } = event;
+						const { d: { message } } = event;
 
 						// Check if message exists
 						const persistedMessage = Messages.findOne({ _id: message._id });
@@ -271,11 +273,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_DELETE_MESSAGE
 				//
 				case eventTypes.ROOM_DELETE_MESSAGE:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { roomId, messageId } } = event;
+						const { d: { roomId, messageId } } = event;
 
 						// Remove the message
 						Messages.removeById(messageId);
@@ -289,11 +291,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_SET_MESSAGE_REACTION
 				//
 				case eventTypes.ROOM_SET_MESSAGE_REACTION:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { messageId, username, reaction } } = event;
+						const { d: { messageId, username, reaction } } = event;
 
 						// Get persisted message
 						const persistedMessage = Messages.findOne({ _id: messageId });
@@ -323,11 +325,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_UNSET_MESSAGE_REACTION
 				//
 				case eventTypes.ROOM_UNSET_MESSAGE_REACTION:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { messageId, username, reaction } } = event;
+						const { d: { messageId, username, reaction } } = event;
 
 						// Get persisted message
 						const persistedMessage = Messages.findOne({ _id: messageId });
@@ -367,11 +369,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_MUTE_USER
 				//
 				case eventTypes.ROOM_MUTE_USER:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { roomId, user } } = event;
+						const { d: { roomId, user } } = event;
 
 						// Denormalize user
 						const denormalizedUser = normalizers.denormalizeUser(user);
@@ -385,11 +387,11 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 				// ROOM_UNMUTE_USER
 				//
 				case eventTypes.ROOM_UNMUTE_USER:
-					eventResult = await FederationRoomEvents.addEvent(event.context, event);
+					eventResult = await RoomEvents.addEvent(eventContext, event);
 
 					// If the event was successfully added, handle the event locally
 					if (eventResult.success) {
-						const { data: { roomId, user } } = event;
+						const { d: { roomId, user } } = event;
 
 						// Denormalize user
 						const denormalizedUser = normalizers.denormalizeUser(user);
@@ -410,7 +412,7 @@ API.v1.addRoute('federation.events.dispatch', { authRequired: false }, {
 			if (!eventResult.success) {
 				logger.server.debug(`federation.events.dispatch => Event has missing parents -> event=${ JSON.stringify(event, null, 2) }`);
 
-				requestEventsFromLatest(event.origin, getFederationDomain(), contextDefinitions.defineType(event), event.context, eventResult.latestEventIds);
+				requestEventsFromLatest(event.src, getFederationDomain(), contextDefinitions.defineType(event), eventContext, eventResult.latestEventIds);
 
 				// And stop handling the events
 				break;

@@ -4,10 +4,13 @@ import _ from 'underscore';
 import { Base } from './_Base';
 import Rooms from './Rooms';
 import { settings } from '../../../settings/server/functions/settings';
+import { RoomEvents } from './RoomEvents';
+import { getLocalSrc } from '../../../events/server/lib/getLocalSrc';
+import { EventTypeDescriptor } from '../../../events/definitions/IEvent';
 
 export class Messages extends Base {
 	constructor() {
-		super('message');
+		super('message_old');
 
 		this.tryEnsureIndex({ rid: 1, ts: 1 });
 		this.tryEnsureIndex({ ts: 1 });
@@ -65,6 +68,104 @@ export class Messages extends Base {
 			multi: true,
 		});
 	}
+
+	//
+	// Overriding some methods to add V1<->V2 conversion
+	//
+	find(...args) {
+		if (args[0]) {
+			// Add a `t: msg`
+			args[0].t = EventTypeDescriptor.ROOM_MESSAGE;
+		}
+
+		const cursor = RoomEvents.find.apply(RoomEvents, args);
+
+		cursor._fetch = cursor.fetch;
+		cursor.fetch = function(...args) {
+			const results = this._fetch(args);
+
+			// Convert to V1
+			return results.map(RoomEvents.toV1);
+		}.bind(cursor);
+
+		return cursor;
+	}
+
+	_findOne(method, ...args) {
+		let result = RoomEvents[method].apply(RoomEvents, args);
+
+		if (result) {
+			result = RoomEvents.toV1(result);
+		}
+
+		return result;
+	}
+
+	findOne(...args) {
+		return this._findOne('findOne', ...args);
+	}
+
+	findOneById(...args) {
+		return this._findOne('findOne', { _cid: args[0] });
+	}
+
+	findOneByIds(ids, options, ...args) {
+		return this._findOne('findOne', [{ _cid: { $in: ids } }, options, ...args]);
+	}
+
+	insert(...args) {
+		const [message] = args;
+
+		const event = Promise.await(RoomEvents.createMessageEvent(getLocalSrc(), message.rid, message._id, RoomEvents.fromV1Data(message)));
+
+		this.emit('dispatchEvent', event);
+
+		return RoomEvents.toV1(event)._id;
+	}
+
+	update(...args) {
+		const [query, update] = args;
+
+		const _cid = query._id;
+
+		query._cid = _cid;
+		delete query._id;
+
+		const event = RoomEvents.findOne(query);
+
+		let d = {};
+
+		if (update.$set) {
+			d.set = RoomEvents.fromV1Data(update.$set);
+		} else if (update.$unset) {
+			d.unset = update.$unset;
+		} else {
+			d = update;
+		}
+
+		d._oid = event._id; // Original id
+
+		const editEvent = Promise.await(RoomEvents.createEditMessageEvent(event.src, event.rid, _cid, d));
+
+		this.emit('dispatchEvent', editEvent);
+
+		return RoomEvents.toV1(editEvent);
+	}
+
+	upsert(...args) {
+		const [query] = args;
+
+		const event = RoomEvents.findOne(query);
+
+		if (event) {
+			return this.update(...args);
+		}
+
+		return this.insert(...args);
+	}
+	//
+	// ^^^
+	//
 
 	createRoomArchivedByRoomIdAndUser(roomId, user) {
 		return this.createWithTypeRoomIdMessageAndUser('room-archived', roomId, '', user);

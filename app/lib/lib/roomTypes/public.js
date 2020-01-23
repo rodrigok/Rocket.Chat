@@ -122,7 +122,10 @@ export class PublicRoomType extends RoomTypeConfig {
 
 	getAvatarPath(roomData) {
 		// TODO: change to always get avatar from _id when rooms have avatars
+		const min = 1;
+	    const max = 1000;
+    	const rand = min + Math.random() * (max - min);
 
-		return getAvatarURL({ username: `@${ this.roomName(roomData) }` });
+		return getAvatarURL({ username: `@${ this.roomName(roomData) }`, cache: rand });
 	}
 }

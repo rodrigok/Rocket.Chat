@@ -13,6 +13,7 @@ import { callbacks } from '../../../callbacks';
 import { hasPermission, hasAllPermission, hasRole, hasAtLeastOnePermission } from '../../../authorization';
 import { t, roomTypes, RoomSettingsEnum } from '../../../utils';
 import { ChannelSettings } from '../lib/ChannelSettings';
+import { Notifications } from '../../../notifications';
 
 const common = {
 	canLeaveRoom() {
@@ -137,6 +138,53 @@ const fixRoomName = (old) => {
 };
 
 Template.channelSettingsEditing.events({
+	'click .js-select-avatar-initials'(e, template) {
+		template.avatar.set({
+			service: 'initials',
+			blob: template.room.name,
+		});
+	},
+
+	'click .js-select-avatar-url'(e, template) {
+		const url = template.url.get().trim();
+		if (!url) {
+			return;
+		}
+
+		template.avatar.set({
+			service: 'url',
+			contentType: '',
+			blob: url,
+		});
+	},
+
+	'input .js-avatar-url-input'(e, template) {
+		const text = e.target.value;
+		template.url.set(text);
+	},
+
+	'change .js-select-avatar-upload [type=file]'(event, template) {
+		const e = event.originalEvent || event;
+		let { files } = e.target;
+		if (!files || files.length === 0) {
+			files = (e.dataTransfer && e.dataTransfer.files) || [];
+		}
+		Object.keys(files).forEach((key) => {
+			const blob = files[key];
+			if (!/image\/.+/.test(blob.type)) {
+				return;
+			}
+			const reader = new FileReader();
+			reader.readAsDataURL(blob);
+			reader.onloadend = function() {
+				template.avatar.set({
+					service: 'upload',
+					contentType: blob.type,
+					blob: reader.result,
+				});
+			};
+		});
+	},
 	'input [name="name"]'(e) {
 		const input = e.currentTarget;
 		const modified = fixRoomName(input.value);
@@ -194,6 +242,29 @@ Template.channelSettingsEditing.events({
 	},
 	async 'click .js-save'(e, t) {
 		const { settings } = t;
+
+		const avatar = t.avatar.get();
+		if (avatar) {
+			let method;
+			const params = [];
+
+			if (avatar.service === 'initials') {
+				method = 'resetRoomAvatar';
+			} else {
+				method = 'setRoomAvatarFromService';
+				params.push(avatar.blob, avatar.contentType, avatar.service);
+			}
+
+			Meteor.call(method, ...params, t.room._id, function(err) {
+				if (err && err.details) {
+					toastr.error(t(err.message));
+				} else {
+					toastr.success(t('Avatar_changed_successfully'));
+					callbacks.run('channelAvatarSet', avatar.service);
+				}
+			});
+		}
+
 		Object.keys(settings).forEach(async (name) => {
 			const setting = settings[name];
 			const value = setting.value.get();
@@ -210,6 +281,10 @@ Template.channelSettingsEditing.events({
 Template.channelSettingsEditing.onCreated(function() {
 	const room = ChatRoom.findOne(this.data && this.data.rid);
 	this.room = room;
+	this.avatar = new ReactiveVar();
+	this.url = new ReactiveVar('');
+	Notifications.onLogged('updateAvatar', () => this.avatar.set());
+
 	this.settings = {
 		name: {
 			type: 'text',
@@ -686,6 +761,26 @@ Template.channelSettingsEditing.helpers({
 	disabled() {
 		return !this.canEdit();
 	},
+	showAvatar() {
+		const { room } = Template.instance();
+		return !room.prid;
+	},
+	avatarPreview() {
+		return Template.instance().avatar.get();
+	},
+	channelName() {
+		return `${ Template.instance().room.name }`;
+	},
+	channelIcon() {
+		return roomTypes.getIcon(Template.instance().room);
+	},
+	name() {
+		const { room } = Template.instance();
+		return roomTypes.getRoomName(room.t, room);
+	},
+	archived() {
+		return Template.instance().room.archived;
+	},
 	checked() {
 		return this.value.get();// ? '' : 'checked';
 	},
@@ -772,7 +867,7 @@ Template.channelSettingsInfo.onCreated(function() {
 Template.channelSettingsInfo.helpers({
 	...common,
 	channelName() {
-		return `@${ Template.instance().room.name }`;
+		return `${ Template.instance().room.name }`;
 	},
 	archived() {
 		return Template.instance().room.archived;

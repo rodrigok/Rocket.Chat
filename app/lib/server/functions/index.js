@@ -26,7 +26,6 @@ export { setRealName, _setRealName } from './setRealName';
 export { setStatusText, _setStatusText } from './setStatusText';
 export { getStatusText } from './getStatusText';
 export { setUserAvatar } from './setUserAvatar';
-export { setRoomAvatar } from './setRoomAvatar';
 export { _setUsername, setUsername } from './setUsername';
 export { unarchiveRoom } from './unarchiveRoom';
 export { updateMessage } from './updateMessage';

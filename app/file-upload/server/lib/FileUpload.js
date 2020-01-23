@@ -274,29 +274,14 @@ export const FileUpload = {
 		if (Meteor.userId() !== file.userId && !hasPermission(Meteor.userId(), 'edit-other-user-info')) {
 			throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
 		}
-
-		if (file.roomId) {
-			// update file record to match user's username
-			const room = Rooms.findOneByIdOrName(file.roomId);
-			let roomName = `@${room.name}`;
-			const oldAvatar = Avatars.findOneByName(room.name);
-			if (oldAvatar) {
-				Avatars.deleteFile(oldAvatar._id);
-			}
-			
-			Avatars.updateFileNameById(file._id, roomName);
-		} else {
-			// update file record to match user's username
-			const user = Users.findOneById(file.userId);
-			const oldAvatar = Avatars.findOneByName(user.username);
-			if (oldAvatar) {
-				Avatars.deleteFile(oldAvatar._id);
-			}
-			
-			Avatars.updateFileNameById(file._id, user.username);
+		// update file record to match user's username
+		const user = Users.findOneById(file.userId);
+		const oldAvatar = Avatars.findOneByName(user.username);
+		if (oldAvatar) {
+			Avatars.deleteFile(oldAvatar._id);
 		}
-		
-		//console.log('upload finished ->', file);
+		Avatars.updateFileNameById(file._id, user.username);
+		// console.log('upload finished ->', file);
 	},
 
 	requestCanAccessFiles({ headers = {}, query = {} }) {
@@ -454,6 +439,7 @@ export class FileUploadClass {
 
 	deleteByName(fileName) {
 		const file = this.model.findOneByName(fileName);
+
 		if (!file) {
 			return;
 		}

@@ -251,19 +251,17 @@ API.v1.addRoute('users.resetAvatar', { authRequired: true }, {
 });
 
 API.v1.addRoute('users.resetRoomAvatar', { authRequired: true }, {
-	post() {
-		const user = this.getUserFromParams();
+        post() {
+	        const { userId } = this.bodyParams;
 
-		if (user._id === this.userId) {
-			Meteor.runAsUser(this.userId, () => Meteor.call('resetRoomAvatar'));
-		} else if (hasPermission(this.userId, 'edit-other-user-info')) {
-			Meteor.runAsUser(user._id, () => Meteor.call('resetRoomAvatar'));
-		} else {
-			return API.v1.unauthorized();
-		}
+            if (hasPermission(this.userId, 'edit-other-user-info')) {
+                    Meteor.runAsUser(this.userId, () => Meteor.call('resetRoomAvatar', userId));
+            } else {
+                    return API.v1.unauthorized();
+            }
 
-		return API.v1.success();
-	},
+            return API.v1.success();
+        },
 });
 
 API.v1.addRoute('users.setAvatar', { authRequired: true }, {

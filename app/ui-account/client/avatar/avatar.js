@@ -3,6 +3,7 @@ import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 
 import { getUserAvatarURL } from '../../../utils/lib/getUserAvatarURL';
+import { getAvatarURL } from '../../../utils/lib/getAvatarURL';
 
 Template.avatar.helpers({
 	src() {
@@ -23,7 +24,12 @@ Template.avatar.helpers({
 		Session.get(`avatar_random_${ username }`);
 
 		if (this.roomIcon) {
-			username = `@${ username }`;
+			//username = `@${ username }`;
+			const min = 1;
+	    	const max = 1000;
+    		const rand = min + Math.random() * (max - min);
+    		
+			return getAvatarURL({ username: `@${ username }`, cache: rand });
 		}
 
 		return getUserAvatarURL(username);

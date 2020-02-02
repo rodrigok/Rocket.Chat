@@ -143,6 +143,25 @@ Template.channelSettingsEditing.events({
 			service: 'initials',
 			blob: template.room.name,
 		});
+
+		const avatar = template.avatar.get();
+		if (avatar) {
+			const { settings } = template;
+			let method;
+			const params = [];
+
+			method = 'resetRoomAvatar';
+			params.push(avatar.blob, avatar.contentType, avatar.service);
+			
+			Meteor.call(method, ...params, template.room._id, function(err) {
+				if (err && err.details) {
+					toastr.error(t(err.message));
+				} else {
+					toastr.success(t('Avatar_changed_successfully'));
+					callbacks.run('channelAvatarSet', avatar.service);
+				}
+			});
+		}
 	},
 
 	'click .js-select-avatar-url'(e, template) {
@@ -156,6 +175,25 @@ Template.channelSettingsEditing.events({
 			contentType: '',
 			blob: url,
 		});
+
+		const avatar = template.avatar.get();
+		if (avatar) {
+			const { settings } = template;
+			let method;
+			const params = [];
+
+			method = 'setRoomAvatarFromService';
+			params.push(avatar.blob, avatar.contentType, avatar.service);
+			
+			Meteor.call(method, ...params, template.room._id, function(err) {
+				if (err && err.details) {
+					toastr.error(t(err.message));
+				} else {
+					toastr.success(t('Avatar_changed_successfully'));
+					callbacks.run('channelAvatarSet', avatar.service);
+				}
+			});
+		}
 	},
 
 	'input .js-avatar-url-input'(e, template) {
@@ -182,6 +220,25 @@ Template.channelSettingsEditing.events({
 					contentType: blob.type,
 					blob: reader.result,
 				});
+
+				const avatar = template.avatar.get();
+				if (avatar) {
+					const { settings } = template;
+					let method;
+					const params = [];
+
+					method = 'setRoomAvatarFromService';
+					params.push(avatar.blob, avatar.contentType, avatar.service);
+					
+					Meteor.call(method, ...params, template.room._id, function(err) {
+						if (err && err.details) {
+							toastr.error(t(err.message));
+						} else {
+							toastr.success(t('Avatar_changed_successfully'));
+							callbacks.run('channelAvatarSet', avatar.service);
+						}
+					});
+				}
 			};
 		});
 	},
@@ -242,28 +299,6 @@ Template.channelSettingsEditing.events({
 	},
 	async 'click .js-save'(e, t) {
 		const { settings } = t;
-
-		const avatar = t.avatar.get();
-		if (avatar) {
-			let method;
-			const params = [];
-
-			if (avatar.service === 'initials') {
-				method = 'resetRoomAvatar';
-			} else {
-				method = 'setRoomAvatarFromService';
-				params.push(avatar.blob, avatar.contentType, avatar.service);
-			}
-
-			Meteor.call(method, ...params, t.room._id, function(err) {
-				if (err && err.details) {
-					toastr.error(t(err.message));
-				} else {
-					toastr.success(t('Avatar_changed_successfully'));
-					callbacks.run('channelAvatarSet', avatar.service);
-				}
-			});
-		}
 
 		Object.keys(settings).forEach(async (name) => {
 			const setting = settings[name];

@@ -151,7 +151,7 @@ Template.channelSettingsEditing.events({
 			const params = [];
 
 			method = 'resetRoomAvatar';
-			params.push(avatar.blob, avatar.contentType, avatar.service);
+			params.push(template.room._id, avatar.contentType, avatar.service);
 			
 			Meteor.call(method, ...params, template.room._id, function(err) {
 				if (err && err.details) {

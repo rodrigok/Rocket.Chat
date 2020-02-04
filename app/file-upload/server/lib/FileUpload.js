@@ -149,8 +149,15 @@ export const FileUpload = {
 		if (settings.get('Accounts_AvatarResize') !== true) {
 			return;
 		}
-		if (Meteor.userId() !== file.userId && !hasPermission(Meteor.userId(), 'edit-other-user-info')) {
-			throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
+
+		if (file.roomId) {
+			if (!hasPermission(Meteor.userId(), 'edit-room', file.roomId)) {
+				throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
+			}
+		} else {
+			if (Meteor.userId() !== file.userId && !hasPermission(Meteor.userId(), 'edit-other-user-info')) {
+				throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
+			}
 		}
 
 		const tempFilePath = UploadFS.getTempFilePath(file._id);
@@ -271,11 +278,10 @@ export const FileUpload = {
 	},
 
 	avatarsOnFinishUpload(file) {
-		if (Meteor.userId() !== file.userId && !hasPermission(Meteor.userId(), 'edit-other-user-info')) {
-			throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
-		}
-
 		if (file.roomId) {
+			if (!hasPermission(Meteor.userId(), 'edit-room', file.roomId)) {
+				throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
+			}
 			// update file record to match user's username
 			const room = Rooms.findOneByIdOrName(file.roomId);
 			let roomName = `@${room.name}`;
@@ -286,6 +292,10 @@ export const FileUpload = {
 			
 			Avatars.updateFileNameById(file._id, roomName);
 		} else {
+			if (Meteor.userId() !== file.userId && !hasPermission(Meteor.userId(), 'edit-other-user-info')) {
+				throw new Meteor.Error('error-not-allowed', 'Change avatar is not allowed');
+			}
+
 			// update file record to match user's username
 			const user = Users.findOneById(file.userId);
 			const oldAvatar = Avatars.findOneByName(user.username);

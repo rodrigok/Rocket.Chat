@@ -245,6 +245,21 @@ Template.userInfo.events({
 	},
 });
 
+Template.userInfo.onRendered(function () {
+    this.autorun(() => {
+        let name;
+        userSearch(Meteor.user()/*._id*/, this.data.user, (results) => {
+            user = results.results[0];
+            this.userName = user.name; //team.name;
+            //this.teamOwner = team.owner;
+            //this.teamMembers = team.members;
+           //this.teamUsercount = team.usersCount;
+			//this.teamId = team._id;
+			this.userId = user._id;
+        });
+    });
+});
+
 Template.userInfo.onCreated(function() {
 	this.now = new ReactiveVar(moment());
 	this.user = new ReactiveVar();
@@ -266,7 +281,7 @@ Template.userInfo.onCreated(function() {
 	this.editingUser = new ReactiveVar();
 	this.loadingUserInfo = new ReactiveVar(true);
 	this.loadedUsername = new ReactiveVar();
-	this.tabBar = Template.currentData().tabBar;
+	//this.tabBar = Template.currentData().tabBar;
 	this.nowInterval = setInterval(() => this.now.set(moment()), 30000);
 
 	this.autorun(() => {

@@ -119,9 +119,12 @@ export class PrivateRoomType extends RoomTypeConfig {
 	    const max = 1000;
     	const rand = min + Math.random() * (max - min);
 
-		// if room is not a discussion, returns the avatar for its name
+    	// if room is not a discussion, returns the avatar for its name
 		if (!roomData.prid) {
-			return getAvatarURL({ username: `@${ this.roomName(roomData) }`, cache: rand });
+			//return getAvatarURL({ username: `@${ this.roomName(roomData) }`, cache: rand });
+
+			//use the name element instead of the fname since special characters could screw things up 
+			return getAvatarURL({ username: `@${ roomData.name }`, cache: rand });
 		}
 
 		// if discussion's parent room is known, get his avatar

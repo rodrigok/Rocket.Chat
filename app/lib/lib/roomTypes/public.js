@@ -126,6 +126,9 @@ export class PublicRoomType extends RoomTypeConfig {
 	    const max = 1000;
     	const rand = min + Math.random() * (max - min);
 
-		return getAvatarURL({ username: `@${ this.roomName(roomData) }`, cache: rand });
+		//return getAvatarURL({ username: `@${ this.roomName(roomData) }`, cache: rand });
+
+		//use the name element instead of the fname since special characters could screw things up 
+		return getAvatarURL({ username: `@${ roomData.name }`, cache: rand });
 	}
 }

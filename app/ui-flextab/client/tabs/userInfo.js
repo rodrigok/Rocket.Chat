@@ -11,7 +11,9 @@ import { popover } from '../../../ui-utils';
 import { templateVarHandler } from '../../../utils';
 import { RoomRoles, UserRoles, Roles } from '../../../models';
 import { settings } from '../../../settings';
+import FullUser from '../../../models/client/models/FullUser';
 import { getActions } from './userActions';
+
 import './userInfo.html';
 import { APIClient } from '../../../utils/client';
 
@@ -247,6 +249,21 @@ Template.userInfo.events({
 	'click .js-back'(e, instance) {
 		return instance.clear();
 	},
+});
+
+Template.userInfo.onRendered(function () {
+    this.autorun(() => {
+        let name;
+        userSearch(Meteor.user()/*._id*/, this.data.user, (results) => {
+            user = results.results[0];
+            this.userName = user.name; //team.name;
+            //this.teamOwner = team.owner;
+            //this.teamMembers = team.members;
+           //this.teamUsercount = team.usersCount;
+			//this.teamId = team._id;
+			this.userId = user._id;
+        });
+    });
 });
 
 Template.userInfo.onCreated(function() {

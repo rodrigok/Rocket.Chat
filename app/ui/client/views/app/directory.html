@@ -168,6 +168,64 @@
 					</tbody>
 				{{/table}}
 			{{/if}}
+		<!--	{{#if $eq searchType 'users'}}
+				{{#table onItemClick=onTableItemClick onScroll=onTableScroll onResize=onTableResize onSort=onTableSort}}
+					<thead>
+						<tr>
+							<th class="directory__user-name js-sort {{#if searchSortBy 'name'}}is-sorting{{/if}}" data-sort="name">
+								<div class="table-fake-th"><span>{{_ "Name"}}</span> {{> icon icon=(sortIcon 'name') }}</div>
+							</th>
+							<th class="directory__owner js-sort {{#if searchSortBy 'owner'}}is-sorting{{/if}}" data-sort="owner">
+								<div class="table-fake-th"><span>{{_ "Owner"}}</span> {{> icon icon=(sortIcon 'owner') }}</div>
+							</th>
+							<th class="directory__user-count js-sort {{#if searchSortBy 'users'}}is-sorting{{/if}}" data-sort="users">
+								<div class="table-fake-th"><span>{{_ "Users"}}</span> {{> icon icon=(sortIcon 'users') }}</div>
+							</th>
+							<th class="table-column-date js-sort {{#if searchSortBy 'createdAt'}}is-sorting{{/if}}" data-sort="createdAt">
+								<div class="table-fake-th"><span>{{_ "Created_at"}}</span> {{> icon icon=(sortIcon 'createdAt') }}</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each searchResults}}
+							<tr data-name="{{name}}">
+								<td>
+									<div class="rc-table-wrapper">
+										<div class="rc-table-avatar">{{> avatar username=name}}</div>
+										<div class="rc-table-info">
+											<span class="rc-table-title">
+												{{name}}
+											</span>
+										</div>
+									</div>
+								</td>
+								<td>{{owner}}</td>
+								<td>{{users}}</td>
+								<td>{{createdAt}}</td>
+							</tr>
+						{{else}}
+							{{# with searchText}}
+								<tr class="table-no-click">
+									<td colspan="{{sumColumnCount 3 (canViewOtherUserInfo) ($eq searchWorkspace 'external')}}">
+										{{_ "No_results_found_for"}} {{.}}
+									</td>
+								</tr>
+							{{/with}}
+						{{/each}}
+						{{#if isLoading}}
+							<tr class="table-no-click">
+								<td class="table-loading-td"
+									colspan="{{sumColumnCount 3 (canViewOtherUserInfo) ($eq searchWorkspace 'external')}}">
+									{{> loading}}
+								</td>
+							</tr>
+						{{/if}}
+					</tbody>
+				{{/table}}
+			{{/if}} -->
+		</div>
+		<div class="rc-user-info-container flex-nav animated{{#unless showUserInfo}} animated-hidden{{/unless}}">
+			{{> userInfo (userInfoDetail)}}
 		</div>
 	</section>
 </template>

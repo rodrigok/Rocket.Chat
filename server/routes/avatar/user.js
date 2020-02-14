@@ -26,11 +26,11 @@ export const userAvatar = Meteor.bindEnvironment(function(req, res) {
 	setCacheAndDispositionHeaders(req, res);
 
 	// if request starts with @ always return the svg letters
-	if (requestUsername[0] === '@') {
-		const svg = renderSVGLetters(requestUsername.substr(1), avatarSize);
-		serveAvatar(svg, req.query.format, res);
-		return;
-	}
+	//if (requestUsername[0] === '@') {
+	//	const svg = renderSVGLetters(requestUsername.substr(1), avatarSize);
+	//	serveAvatar(svg, req.query.format, res);
+	//	return;
+	//}
 
 	const reqModifiedHeader = req.headers['if-modified-since'];
 

@@ -1,7 +1,7 @@
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
-import { TAPi18n } from 'meteor/tap:i18n';
+import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
 import _ from 'underscore';
 import s from 'underscore.string';
 import moment from 'moment';
@@ -15,6 +15,7 @@ import FullUser from '../../../models/client/models/FullUser';
 import { getActions } from './userActions';
 
 import './userInfo.html';
+import { APIClient } from '../../../utils/client';
 
 const shownActionsCount = 2;
 
@@ -114,14 +115,14 @@ Template.userInfo.helpers({
 	lastLogin() {
 		const user = Template.instance().user.get();
 		if (user && user.lastLogin) {
-			return moment(user.lastLogin).format('LLL');
+			return DateFormat.formatDateAndTime(user.lastLogin);
 		}
 	},
 
 	createdAt() {
 		const user = Template.instance().user.get();
 		if (user && user.createdAt) {
-			return moment(user.createdAt).format('LLL');
+			return DateFormat.formatDateAndTime(user.createdAt);
 		}
 	},
 	linkedinUsername() {
@@ -168,8 +169,13 @@ Template.userInfo.helpers({
 		const data = Template.currentData();
 		return {
 			user: instance.user.get(),
-			back(username) {
+			back({ _id, username }) {
 				instance.editingUser.set();
+
+				if (_id) {
+					data.onChange && data.onChange();
+					return instance.loadUser({ _id });
+				}
 
 				if (username != null) {
 					const user = instance.user.get();
@@ -245,6 +251,21 @@ Template.userInfo.events({
 	},
 });
 
+Template.userInfo.onRendered(function () {
+    this.autorun(() => {
+        let name;
+        userSearch(Meteor.user()/*._id*/, this.data.user, (results) => {
+            user = results.results[0];
+            this.userName = user.name; //team.name;
+            //this.teamOwner = team.owner;
+            //this.teamMembers = team.members;
+           //this.teamUsercount = team.usersCount;
+			//this.teamId = team._id;
+			this.userId = user._id;
+        });
+    });
+});
+
 Template.userInfo.onCreated(function() {
 	this.now = new ReactiveVar(moment());
 	this.user = new ReactiveVar();
@@ -265,21 +286,32 @@ Template.userInfo.onCreated(function() {
 	});
 	this.editingUser = new ReactiveVar();
 	this.loadingUserInfo = new ReactiveVar(true);
-	this.loadedUsername = new ReactiveVar();
 	this.tabBar = Template.currentData().tabBar;
 	this.nowInterval = setInterval(() => this.now.set(moment()), 30000);
 
-	this.autorun(() => {
-		const username = this.loadedUsername.get();
+	this.loadUser = async ({ _id, username }) => {
+		this.loadingUserInfo.set(true);
 
-		if (username == null) {
-			this.loadingUserInfo.set(false);
+		const params = {};
+
+		if (_id != null) {
+			params.userId = _id;
+		} else if (username != null) {
+			params.username = username;
+		}
+
+		const { user } = await APIClient.v1.get('users.info', params);
+		this.user.set(user);
+		this.loadingUserInfo.set(false);
+	};
+
+	this.autorun(async () => {
+		const data = Template.currentData();
+		if (!data) {
 			return;
 		}
 
-		this.loadingUserInfo.set(true);
-
-		return this.subscribe('fullUserData', username, 1, () => this.loadingUserInfo.set(false));
+		this.loadUser(data);
 	});
 
 	this.autorun(() => {
@@ -287,25 +319,6 @@ Template.userInfo.onCreated(function() {
 		if (data.clear != null) {
 			this.clear = data.clear;
 		}
-	});
-
-	this.autorun(() => {
-		const data = Template.currentData();
-		const user = this.user.get();
-		return this.loadedUsername.set((user != null ? user.username : undefined) || (data != null ? data.username : undefined));
-	});
-
-	return this.autorun(() => {
-		let filter;
-		const data = Template.currentData();
-		if (data && data.username != null) {
-			filter = { username: data.username };
-		} else if (data && data._id != null) {
-			filter = { _id: data._id };
-		}
-		const user = FullUser.findOne(filter);
-
-		return this.user.set(user);
 	});
 });
 

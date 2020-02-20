@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
+//import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import _ from 'underscore';
 
@@ -7,6 +8,11 @@ import { timeAgo } from './helpers';
 import { hasAllPermission } from '../../../../authorization/client';
 import { t, roomTypes } from '../../../../utils';
 import { settings } from '../../../../settings';
+import { modal } from '../../../../ui-utils/'
+//import { userInfo } from '../../../../ui-flextab'
+import { WebRTC } from '../../../../webrtc/client';
+//import { getActions } from './userActions';
+import { ChatRoom } from '../../../../models';
 import { hasAtLeastOnePermission } from '../../../../authorization';
 import './directory.html';
 import './directory.css';
@@ -33,7 +39,8 @@ function directorySearch(config, cb) {
 					// If there is no email address (probably only rocket.cat) show the username)
 					email: (result.emails && result.emails[0] && result.emails[0].address) || result.username,
 					createdAt: timeAgo(result.createdAt, t),
-					domain: result.federation && result.federation.peer,
+					origin: result.federation && result.federation.origin,
+					isRemote: result.isRemote,
 				};
 			}
 			return null;
@@ -131,8 +138,22 @@ Template.directory.helpers({
 				type = 'c';
 				routeConfig = { name: item.name };
 			} else {
-				type = 'd';
-				routeConfig = { name: item.username };
+				//type = 'd';
+				//routeConfig = { name: item.username };
+				modal.open({
+					title: 'User Info',
+					content: 'userInfo',
+					data: {
+						onCreate() {
+							modal.close();
+						},
+						username: item.username,
+					},
+					modifier: 'modal',
+					showConfirmButton: false,
+					showCancelButton: false,
+					confirmOnEnter: false,
+				});
 			}
 			roomTypes.openRouteLink(type, routeConfig);
 		};
@@ -187,6 +208,30 @@ Template.directory.helpers({
 			.slice(0, -1)
 			.map((value) => (typeof value === 'number' ? value : Number(!!value)))
 			.reduce((sum, value) => sum + value, 0);
+	},
+	showUserInfo() {
+		const webrtc = WebRTC.getInstanceByRoomId(this.rid);
+		let videoActive = undefined;
+		if (webrtc && webrtc.localUrl && webrtc.localUrl.get()) {
+			videoActive = webrtc.localUrl.get();
+		} else if (webrtc && webrtc.remoteItems && webrtc.remoteItems.get() && webrtc.remoteItems.get().length > 0) {
+			videoActive = webrtc.remoteItems.get();
+		}
+		return Template.instance().showDetail.get() && !videoActive;
+	},
+
+	userInfoDetail() {
+		//const room = ChatRoom.findOne(this.rid, { fields: { t: 1 } });
+
+		return {
+			tabBar: Template.currentData().tabBar,
+			username: Template.instance().userDetail.get(),
+			clear: Template.instance().clearUserDetail,
+			//showAll: roomTypes.roomTypes[room.t].userDetailShowAll(room) || false,
+			//hideAdminControls: roomTypes.roomTypes[room.t].userDetailShowAdmin(room) || false,
+			//video: ['d'].includes(room && room.t),
+			//showBackButton: roomTypes.roomTypes[room.t].isGroupChat(),
+		};
 	},
 });
 
@@ -260,17 +305,46 @@ Template.directory.onCreated(function() {
 		this.searchSortBy = new ReactiveVar('name');
 		this.sortDirection = new ReactiveVar('asc');
 	}
+	this.tabBar = this.data.tabBar;
 	this.searchText = new ReactiveVar('');
 	this.searchWorkspace = new ReactiveVar('local');
 	this.limit = new ReactiveVar(0);
 	this.page = new ReactiveVar(0);
 	this.end = new ReactiveVar(false);
+	this.userDetail = new ReactiveVar();
+	this.showAllUsers = new ReactiveVar(false);
+	this.showDetail = new ReactiveVar(false);
 
 	this.results = new ReactiveVar([]);
 
 	this.isLoading = new ReactiveVar(false);
 
 	this.canViewOtherUserInfo = new ReactiveVar(false);
+
+	this.showUserDetail = (username, group) => {
+		this.showDetail.set(!!username);
+		this.userDetail.set(username);
+		if (group) {
+			this.showAllUsers.set(group === 'all');
+		}
+	};
+
+	this.clearUserDetail = () => {
+		this.showDetail.set(false);
+		this.tabBar.setData({
+			label: 'Members_List',
+			icon: 'team',
+		});
+		setTimeout(() => this.clearRoomUserDetail(), 100);
+	};
+
+	this.clearRoomUserDetail = this.data.clearUserDetail;
+
+	this.autorun(() => {
+		const { userDetail, groupDetail } = Template.currentData();
+
+		this.showUserDetail(userDetail, groupDetail);
+	});
 
 	this.autorun(() => {
 		this.canViewOtherUserInfo.set(hasAllPermission('view-full-other-user-info'));

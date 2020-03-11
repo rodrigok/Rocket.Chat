@@ -32,6 +32,7 @@
 	& &__user-name,
 	& &__username,
 	& &__email,
+	& &__owner,
 	& &__domain {
 		min-width: 100px;
 	}

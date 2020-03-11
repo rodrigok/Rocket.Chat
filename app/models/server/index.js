@@ -12,6 +12,7 @@ import UserDataFiles from './models/UserDataFiles';
 import Users from './models/Users';
 import Sessions from './models/Sessions';
 import Statistics from './models/Statistics';
+import Teams from './models/Teams';
 import Permissions from './models/Permissions';
 import Roles from './models/Roles';
 import CustomSounds from './models/CustomSounds';
@@ -61,6 +62,7 @@ export {
 	Users,
 	Sessions,
 	Statistics,
+	Teams,
 	Permissions,
 	Roles,
 	CustomSounds,

@@ -1,0 +1,29 @@
+<template name="EditTeam">
+    <section class=edit-team>
+        <div class="edit-team__wrapper">
+            <p class="edit-team__description">{{_ "Team_description"}}</p>
+            <form id="edit-team" class="edit-team__content">
+                <div class="edit-team__inputs">
+                    <div class="rc-input">
+                        <label class="rc-input__label">
+                            Team Name
+                        </label>
+                        <input value="{{ teamName }}"/>
+                    </div>
+                    <div class="rc-input">
+                        <label class="rc-input__label">
+                            Team Owner
+                        </label>
+                        <input value="{{ getTeamOwner }}"/>
+                    </div>
+                    <div class="rc-input">
+                        <label class="rc-input__label">
+                            Team Members
+                        </label>
+                        <input value="{{ getTeamMembers }}"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</template>

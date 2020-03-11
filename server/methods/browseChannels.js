@@ -3,7 +3,7 @@ import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import s from 'underscore.string';
 
 import { hasPermission } from '../../app/authorization';
-import { Rooms, Users } from '../../app/models';
+import { Rooms, Users, Teams } from '../../app/models';
 import { settings } from '../../app/settings/server';
 import { getFederationDomain } from '../../app/federation/server/lib/getFederationDomain';
 import { isFederationEnabled } from '../../app/federation/server/lib/isFederationEnabled';
@@ -35,7 +35,7 @@ Meteor.methods({
 	browseChannels({ text = '', workspace = '', type = 'channels', sortBy = 'name', sortDirection = 'asc', page, offset, limit = 10 }) {
 		const regex = new RegExp(s.trim(s.escapeRegExp(text)), 'i');
 
-		if (!['channels', 'users'].includes(type)) {
+		if (!['channels', 'users', 'teams'].includes(type)) {
 			return;
 		}
 
@@ -93,6 +93,14 @@ Meteor.methods({
 		// non-logged id user
 		if (!user) {
 			return;
+		}
+
+		if (type === 'teams') {
+			const result = Teams.findAll()
+			return {
+				total: result.count(),
+				results: result.fetch(),
+			}
 		}
 
 		// type === users

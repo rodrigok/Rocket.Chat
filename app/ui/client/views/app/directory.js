@@ -14,6 +14,7 @@ import { WebRTC } from '../../../../webrtc/client';
 //import { getActions } from './userActions';
 import { ChatRoom } from '../../../../models';
 import { hasAtLeastOnePermission } from '../../../../authorization';
+import { Teams } from '../../../../teams/lib/teams'
 import './directory.html';
 import './directory.css';
 
@@ -41,6 +42,15 @@ function directorySearch(config, cb) {
 					createdAt: timeAgo(result.createdAt, t),
 					origin: result.federation && result.federation.origin,
 					isRemote: result.isRemote,
+				};
+			}
+
+			if (config.type === 'teams') {
+				return {
+					name: result.name,
+					owner: result.owner,
+					users: result.usersCount,
+					createdAt: timeAgo(result.ts, t),
 				};
 			}
 			return null;
@@ -103,13 +113,22 @@ Template.directory.helpers({
 				return true;
 			},
 		};
+		const teamsTab = {
+			label: t('Teams'),
+			value: 'teams',
+			condition() {
+				return true;
+			},
+		};
 		if (searchType.get() === 'channels') {
 			channelsTab.active = true;
-		} else {
+		} else if (searchType.get() === 'users') {
 			usersTab.active = true;
+		} else {
+			teamsTab.active = true;
 		}
 		return {
-			tabs: [channelsTab, usersTab],
+			tabs: [channelsTab, usersTab, teamsTab],
 			onChange(value) {
 				results.set([]);
 				end.set(false);
@@ -137,17 +156,20 @@ Template.directory.helpers({
 			if (searchType.get() === 'channels') {
 				type = 'c';
 				routeConfig = { name: item.name };
+			} else if (searchType.get() === 'users') {
+				type = 'd';
+				routeConfig = { name: item.username };
 			} else {
 				//type = 'd';
 				//routeConfig = { name: item.username };
 				modal.open({
-					title: 'User Info',
-					content: 'userInfo',
+					title: 'Teams management',
+					content: 'EditTeam',
 					data: {
 						onCreate() {
-							modal.close();
+							model.close();
 						},
-						username: item.username,
+						teamName: item.name,
 					},
 					modifier: 'modal',
 					showConfirmButton: false,

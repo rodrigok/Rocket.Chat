@@ -104,6 +104,7 @@ import '../app/mail-messages/server';
 import '../app/user-status';
 import '../app/utils';
 import '../app/settings';
+import '../app/teams/server';
 import '../app/models';
 import '../app/metrics';
 import '../app/callbacks';

@@ -175,6 +175,23 @@ const toolbarButtons = (user) => [{
 			});
 		};
 
+		const createTeam = (e) => {
+			e.preventDefault();
+			modal.open({
+				title: t('Create_A_New_Team'),
+				content: 'CreateTeam',
+				data: {
+					onCreate() {
+						modal.close();
+					},
+				},
+				modifier: 'modal',
+				showConfirmButton: false,
+				showCancelButton: false,
+				confirmOnEnter: false,
+			});
+		};
+
 		const discussionEnabled = settings.get('Discussion_enabled');
 		if (!discussionEnabled) {
 			return createChannel(e);
@@ -209,6 +226,11 @@ const toolbarButtons = (user) => [{
 											confirmOnEnter: false,
 										});
 									},
+								},
+								{
+									icon: 'team',
+									name: t('Team'),
+									action: createTeam,
 								},
 							],
 						},

@@ -18,7 +18,7 @@
 						class="rc-input__element js-search"
 						name="message-search"
 						id="message-search"
-						placeholder="{{#if $eq searchType 'channels'}}{{_ "Search_Channels"}}{{/if}}{{#if $eq searchType 'users'}}{{_ "Search_Users"}}{{/if}}"
+						placeholder="{{#if $eq searchType 'channels'}}{{_ "Search_Channels"}}{{/if}}{{#if $eq searchType 'users'}}{{_ "Search_Users"}}{{/if}}{{#if $eq searchType 'teams'}}{{_ "Search_Teams"}}{{/if}}"
 						autocomplete="off">
 				</div>
 				{{#if $eq searchType 'users'}}
@@ -168,7 +168,7 @@
 					</tbody>
 				{{/table}}
 			{{/if}}
-		<!--	{{#if $eq searchType 'users'}}
+			{{#if $eq searchType 'teams'}}
 				{{#table onItemClick=onTableItemClick onScroll=onTableScroll onResize=onTableResize onSort=onTableSort}}
 					<thead>
 						<tr>
@@ -222,7 +222,7 @@
 						{{/if}}
 					</tbody>
 				{{/table}}
-			{{/if}} -->
+			{{/if}}
 		</div>
 		<div class="rc-user-info-container flex-nav animated{{#unless showUserInfo}} animated-hidden{{/unless}}">
 			{{> userInfo (userInfoDetail)}}

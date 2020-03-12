@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
-//import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import _ from 'underscore';
 
@@ -8,10 +7,8 @@ import { timeAgo } from './helpers';
 import { hasAllPermission } from '../../../../authorization/client';
 import { t, roomTypes } from '../../../../utils';
 import { settings } from '../../../../settings';
-import { modal } from '../../../../ui-utils/'
-//import { userInfo } from '../../../../ui-flextab'
+import { modal } from '../../../../ui-utils/';
 import { WebRTC } from '../../../../webrtc/client';
-//import { getActions } from './userActions';
 import { ChatRoom } from '../../../../models';
 import { hasAtLeastOnePermission } from '../../../../authorization';
 import { Teams } from '../../../../teams/lib/teams'
@@ -157,17 +154,27 @@ Template.directory.helpers({
 				type = 'c';
 				routeConfig = { name: item.name };
 			} else if (searchType.get() === 'users') {
-				type = 'd';
-				routeConfig = { name: item.username };
+				modal.open({
+					title: 'User Info',
+					content: 'userInfo',
+					data: {
+						onCreate() {
+							modal.close();
+						},
+						username: item.username,
+					},
+					modifier: 'modal',
+					showConfirmButton: false,
+					showCancelButton: false,
+					confirmOnEnter: false,
+				});
 			} else {
-				//type = 'd';
-				//routeConfig = { name: item.username };
 				modal.open({
 					title: 'Teams management',
 					content: 'EditTeam',
 					data: {
 						onCreate() {
-							model.close();
+							modal.close();
 						},
 						teamName: item.name,
 					},

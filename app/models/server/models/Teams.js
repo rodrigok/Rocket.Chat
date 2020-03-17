@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import s from 'underscore.string';
 
 import { Base } from './_Base';
 
@@ -12,6 +13,16 @@ export class Teams extends Base {
 
     findAll(){
         return this._db.find();
+    }
+
+    findByNameOrNameRegex(searchTerm, options) {
+        if (options == null) { options = {}; }
+		const termRegex = new RegExp(s.escapeRegExp(searchTerm), 'i');
+		const query = {
+			name: termRegex,
+        };
+
+        return this.find(query, options).fetch();
     }
 
     addTeam(query) {

@@ -154,6 +154,16 @@ Template.membersList.events({
 
 		tabBar.open();
 	},
+	'click .js-teams'() {
+		const { tabBar } = Template.currentData();
+		tabBar.setTemplate('addTeam');
+		tabBar.setData({
+			label: 'Add team',
+			icon: 'team',
+		});
+
+		tabBar.open();
+	},
 	'click .js-invite'() {
 		const { tabBar } = Template.currentData();
 		tabBar.setTemplate('createInviteLink');

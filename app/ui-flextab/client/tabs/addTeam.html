@@ -1,0 +1,43 @@
+<template name="addTeam">
+
+	<div class="rc-input">
+		<label class="rc-input__label">
+			<div class="rc-input__title">Add Team</div>
+			<div class="rc-input__wrapper">
+				<div class="rc-tags rc-tags--no-icon">
+					{{#each team in selectedUsers}}
+						{{> tagTeam team}}
+					{{/each}}
+					<input type="text" class="rc-tags__input" placeholder="{{_ "Username_Placeholder"}}"
+							 name="users" autocomplete="off"/>
+				</div>
+			</div>
+			{{#with config}}
+				{{#if autocomplete 'isShowing'}}
+					{{> popupList data=config items=items ready=(autocomplete 'isLoaded')}}
+				{{/if}}
+			{{/with}}
+		</label>
+	</div>
+	<div class="rc-user-info__flex rc-user-info__row">
+		<button class="rc-button rc-button--outline js-close" title="{{_ 'Cancel'}}">{{_ 'Cancel'}}</button>
+		<button class="rc-button rc-button--primary js-add" disabled={{disabled}}>{{> icon block="rc-input__icon-svg" icon="plus"}}{{tAddTeams}}</button>
+	</div>
+</template>
+
+<template name='tagTeam'>
+	<span class="rc-tags__tag">
+		{{#if name}}
+			<span class="rc-tags__tag-text">{{name}}</span>
+		{{else}}
+			<span class="rc-tags__tag-text">{{text}}</span>
+		{{/if}}
+		{{> icon block="rc-tags__tag-icon" icon="cross"}}
+	</span>
+</template>
+
+<template name="popupList_item_team">
+	<li class="rc-popup-list__item">
+		<span class="rc-popup-list__item-name">{{{item.name}}}</span>
+   </li>
+</template>

@@ -20,6 +20,7 @@ import './oauth/google';
 import './oauth/proxy';
 import './oauth/twitter';
 import './methods/addOAuthService';
+import './methods/addTeamsToRoom';
 import './methods/addUsersToRoom';
 import './methods/addUserToRoom';
 import './methods/archiveRoom';

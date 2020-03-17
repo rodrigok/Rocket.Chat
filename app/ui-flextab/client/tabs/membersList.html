@@ -50,6 +50,11 @@
 		</div>
 		<div class="rc-button__group rc-button__group--stretch">
 			{{#if canAddUser}}
+				<button class="rc-button rc-button--primary js-teams">{{> icon block="rc-input__icon-svg" icon="plus"}}Add Team</button>
+			{{/if}}
+		</div>
+		<div class="rc-button__group rc-button__group--stretch">
+			{{#if canAddUser}}
 				<button class="rc-button rc-button--primary js-add">{{> icon block="rc-input__icon-svg" icon="plus"}}{{_ "Add_users"}}</button>
 			{{/if}}
 

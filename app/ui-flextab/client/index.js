@@ -1,4 +1,5 @@
 import './flexTabBar.html';
+import './tabs/addTeam.html';
 import './tabs/inviteUsers.html';
 import './tabs/createInviteLink.html';
 import './tabs/membersList.html';
@@ -6,6 +7,7 @@ import './tabs/uploadedFilesList.html';
 import './tabs/userEdit.html';
 import './flexTabBar';
 import './tabs/inviteUsers';
+import './tabs/addTeam';
 import './tabs/createInviteLink';
 import './tabs/membersList';
 import './tabs/uploadedFilesList';

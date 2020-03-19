@@ -74,8 +74,8 @@ Meteor.methods({
 				});
 			}
 			const members = team.members;
-			members.forEach((username) => {
-				const newUser = Users.findOneByUsernameIgnoringCase(username);
+			members.forEach((user) => {
+				const newUser = Users.findOneByUsernameIgnoringCase(user.username);
 				const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, newUser._id);
 				if (!subscription) {
 					addTeamUserToRoom(data.rid, newUser, user, teamname);

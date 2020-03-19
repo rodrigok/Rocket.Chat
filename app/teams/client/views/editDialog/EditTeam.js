@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Template } from 'meteor/templating';
-import { popover } from '../../../../ui-utils';
+import { popover, modal } from '../../../../ui-utils';
 import { isRtl } from '../../../../utils';
 import { getActions } from './userActions';
 
@@ -121,7 +121,23 @@ Template.EditTeam.events({
 		};
 		e.stopPropagation();
 		popover.open(config);
-    }
+	},
+	'click .js-add'(e, instance) {
+		modal.open({
+			title: 'User Info',
+			content: 'userInfo',
+			data: {
+				onCreate() {
+					modal.close();
+				},
+				username: this.teamOwner.get(),
+			},
+			modifier: 'modal',
+			showConfirmButton: false,
+			showCancelButton: false,
+			confirmOnEnter: false,
+		});
+	}
 });
 
 Template.EditTeam.onRendered(function () {

@@ -14,7 +14,7 @@ Meteor.methods({
 		createTeam({ owner, t_name, users }) {
 			const team = {
 				name: t_name,
-				owner: owner,
+				owner: [owner],
 				members: users,
 				usersCount: users.length,
 				ts: new Date(),

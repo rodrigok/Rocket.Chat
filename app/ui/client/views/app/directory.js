@@ -43,9 +43,10 @@ function directorySearch(config, cb) {
 			}
 
 			if (config.type === 'teams') {
+				// We get the first owner, since probably creator
 				return {
 					name: result.name,
-					owner: result.owner,
+					owner: result.owner[0].username,
 					users: result.usersCount,
 					createdAt: timeAgo(result.ts, t),
 				};
@@ -170,7 +171,7 @@ Template.directory.helpers({
 				});
 			} else {
 				modal.open({
-					title: 'Teams management',
+					title: item.name,
 					content: 'EditTeam',
 					data: {
 						onCreate() {

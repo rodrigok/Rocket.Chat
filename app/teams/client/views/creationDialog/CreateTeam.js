@@ -62,19 +62,18 @@ Template.CreateTeam.events({
 		t.teamMembers.set(value);
 	},
 	async 'submit #create-team, click .js-save-team'(event, instance) {
-		const owner = Meteor.user().name;
+		const owner = {
+			_id: Meteor.user()._id,
+			name: Meteor.user().name,
+			username: Meteor.user().username,
+		}
 		event.preventDefault();
 
 		const t_name = instance.teamName.get();
-		const users = instance.selectedUsers.get().map(({ username }) => username).filter((value, index, self) => self.indexOf(value) === index);
+		let users = instance.selectedUsers.get();
+		users.forEach((u) => delete u.status);
 
 		const result = await call('createTeam', { owner, t_name, users });
-		// callback to enable tracking
-		callbacks.run('afterDiscussion', Meteor.user(), result);
-
-		if (instance.data.onCreate) {
-			instance.data.onCreate(result);
-		}
 
 		roomTypes.openRouteLink(result.t, result);
 	},

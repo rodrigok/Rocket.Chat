@@ -3055,6 +3055,7 @@
   "TargetRoom_Description": "The room where messages will be sent which are a result of this event being fired. Only one target room is allowed and it must exist.",
   "Target user not allowed to receive messages": "Target user not allowed to receive messages",
   "Team": "Team",
+  "Teams": "My Teams",
   "Team_description": "Use teams to group users for easy channel management.",
   "Team_name": "Team name",
   "Technology_Provider": "Technology Provider",

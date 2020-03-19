@@ -96,7 +96,7 @@ Meteor.methods({
 		}
 
 		if (type === 'teams') {
-			const result = Teams.findAll()
+			const result = Teams.findMyTeams(user)
 			return {
 				total: result.count(),
 				results: result.fetch(),

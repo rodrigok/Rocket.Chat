@@ -15,6 +15,10 @@ export class Teams extends Base {
         return this._db.find();
     }
 
+    findMyTeams(user) {
+        return this._db.find({owner: { $elemMatch: { _id: user._id }}});
+    }
+
     findByNameOrNameRegex(searchTerm, options) {
         if (options == null) { options = {}; }
 		const termRegex = new RegExp(s.escapeRegExp(searchTerm), 'i');

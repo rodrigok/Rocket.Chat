@@ -39,6 +39,7 @@ Template.membersList.helpers({
 		const userUtcOffset = Meteor.user() && Meteor.user().utcOffset;
 		let totalOnline = 0;
 		let users = roomUsers;
+		let teams = [];
 
 		const filter = Template.instance().filter.get();
 		let reg = null;
@@ -68,15 +69,37 @@ Template.membersList.helpers({
 				}
 			}
 
+			const status = onlineUsers[user.username] != null ? onlineUsers[user.username].status : 'offline';
+
+			if(user.team) {
+				const tempUser = user;
+				tempUser.status = status;
+				if (teams.filter(e => e.teamName === user.team).length > 0) {
+					teams.forEach(function(item) {
+						if (item.teamName === user.team) {
+							item.users.push(tempUser);
+						}
+					});
+				} else {
+					teams.push({teamName: user.team, users: [tempUser]});
+				}
+			}
+
 			const muted = (room.ro && !roomUnmuted.includes(user.username)) || roomMuted.includes(user.username);
 
 			return {
 				user,
-				status: onlineUsers[user.username] != null ? onlineUsers[user.username].status : 'offline',
+				status: status,
 				muted,
 				utcOffset,
 			};
 		});
+
+		// Filter out offline users and teams if not showing all.
+		if (!Template.instance().showAllUsers.get()) {
+			users = users.filter(e => !e.status.includes('offline'));
+			teams.forEach((team) => team.users = team.users.filter((u) => !u.status.includes('offline')));
+		}
 
 		const usersTotal = users.length;
 		const { total, loading, usersLimit, loadingMore } = Template.instance();
@@ -90,6 +113,7 @@ Template.membersList.helpers({
 			loading: loading.get(),
 			totalOnline,
 			users,
+			teams,
 			hasMore,
 			rid: this.rid,
 		};
@@ -136,7 +160,9 @@ Template.membersList.helpers({
 
 		return this.user.username;
 	},
-
+	displayTeam() {
+		return this.username;
+	},
 	loadingMore() {
 		return Template.instance().loadingMore.get();
 	},
@@ -293,7 +319,7 @@ Template.membersList.onCreated(function() {
 	this.autorun(() => {
 		if (this.data.rid == null) { return; }
 		this.loading.set(true);
-		return Meteor.call('getUsersOfRoom', this.data.rid, this.showAllUsers.get(), { limit: 100, skip: 0 }, (error, users) => {
+		return Meteor.call('getUsersOfRoom', this.data.rid, true, { limit: 100, skip: 0 }, (error, users) => {
 			if (error) {
 				console.error(error);
 				this.loading.set(false);

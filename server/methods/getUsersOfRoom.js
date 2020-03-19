@@ -22,6 +22,7 @@ function findUsers({ rid, status, skip, limit }) {
 				'u.name': 1,
 				'u.username': 1,
 				'u.status': 1,
+				'team': 1,
 			},
 		},
 		...status ? [{ $match: { 'u.status': status } }] : [],
@@ -37,6 +38,7 @@ function findUsers({ rid, status, skip, limit }) {
 				_id: { $arrayElemAt: ['$u._id', 0] },
 				name: { $arrayElemAt: ['$u.name', 0] },
 				username: { $arrayElemAt: ['$u.username', 0] },
+				team: 1,
 			},
 		},
 	]).toArray();

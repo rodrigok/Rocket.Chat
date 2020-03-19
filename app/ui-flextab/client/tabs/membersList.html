@@ -32,6 +32,31 @@
 				{{> loading}}
 			{{else}}
 				<ul class='list clearfix lines'>
+					{{#each teams}}
+						<li class='rc-member-list__user'>
+							{{> avatar username=this.teamName}}
+							<div class="rc-member-list__username">
+								<div class="rc-member-list__status--{{status}}"></div>
+								{{ignored}} {{displayName}} {{utcOffset}} {{this.teamName}}
+							</div>
+							{{> icon user=. block="rc-member-list__menu js-more" icon="menu" }}
+						</li>
+						<li class='rc-member-list__user'>
+							<ul class='list clearfix lines'>
+							{{#each this.users}}
+							<li class='rc-member-list__user'>
+								{{> avatar username=username}}
+								<div class="rc-member-list__username">
+									<div class="rc-member-list__status rc-member-list__status--{{status}}"></div>
+									{{ignored}} {{username}} {{utcOffset}}
+									</div>
+							</li>
+							{{/each}}
+							</ul>
+						</li>
+					{{/each}}
+				</ul>
+				<ul class='list clearfix lines'>
 					{{#each users}}
 						<li class='rc-member-list__user'>
 							{{> avatar username=user.username}}

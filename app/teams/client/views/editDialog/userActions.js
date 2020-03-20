@@ -4,6 +4,7 @@ export const getActions = ({ user, directActions, hideAdminControls }) => {
     const canRemove = () => {};
 
     const getUser = function getUser(fn, ...args) {
+		user.team = this.data.teamId;
 		if (!user) {
 			return;
 		}
@@ -31,9 +32,8 @@ export const getActions = ({ user, directActions, hideAdminControls }) => {
 			icon: 'sign-out',
 			modifier: 'alert',
 			name: 'Remove from team',
-			action: prevent(getUser, ({ username }) => {
-                const rid = Session.get('openedRoom');
-                Meteor.call('unmuteUserInRoom', { rid, username }, success(() => toastr.success('This worked!')));
+			action: prevent(getUser, ({ username, team }) => {
+                Meteor.call('removeUserFromTeam', user, team, success(() => toastr.success('This worked!')));
             }),
 			condition: true,
 		}

@@ -14,6 +14,7 @@ Meteor.methods({
 		createTeam({ owner, t_name, users }) {
 			const team = {
 				name: t_name,
+				creator: owner,
 				owner: [owner],
 				members: users,
 				usersCount: users.length,
@@ -27,14 +28,16 @@ Meteor.methods({
 				name: t_name
 			}
 			result = Teams.find(query);
-			my_response = {
-				total: result.count(),
-				results: result.fetch()
-			};
 			return {
 				total: result.count(),
 				results: result.fetch()
 			};
+		},
+		addUsersToTeam(users, team_id) {
+			return Teams.addUsersToTeam(users, team_id);
+		},
+		removeUserFromTeam(user, team_id) {
+			return Teams.removeUserFromTeam(user, team_id);
 		}
 	}
 )

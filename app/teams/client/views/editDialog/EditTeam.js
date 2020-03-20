@@ -4,6 +4,7 @@ import { Template } from 'meteor/templating';
 import { popover, modal } from '../../../../ui-utils';
 import { isRtl } from '../../../../utils';
 import { getActions } from './userActions';
+import { Subscriptions } from '../../../../models'
 
 import './EditTeam.html';
 
@@ -74,7 +75,8 @@ Template.EditTeam.events({
         e.currentTarget.parentElement.classList.add('active');
 		const room = Session.get(`roomData${ instance.data.rid }`);
 		const _actions = getActions({
-			user: this.user.user,
+			user: this.user,
+			team: instance.data.teamId,
 			hideAdminControls: false,
 			directActions: false,
 		});
@@ -124,13 +126,15 @@ Template.EditTeam.events({
 	},
 	'click .js-add'(e, instance) {
 		modal.open({
-			title: 'User Info',
-			content: 'userInfo',
+			title: 'Add Users',
+			content: 'addUserToTeam',
 			data: {
 				onCreate() {
 					modal.close();
 				},
-				username: this.teamOwner.get(),
+				label: 'Invite_Users',
+				icon: 'user-plus',
+				team: instance.data.teamId,
 			},
 			modifier: 'modal',
 			showConfirmButton: false,

@@ -43,10 +43,9 @@ function directorySearch(config, cb) {
 			}
 
 			if (config.type === 'teams') {
-				// We get the first owner, since probably creator
 				return {
 					name: result.name,
-					owner: result.owner[0].username,
+					creator: result.creator.username,
 					users: result.usersCount,
 					createdAt: timeAgo(result.ts, t),
 				};

@@ -175,8 +175,8 @@
 							<th class="directory__user-name js-sort {{#if searchSortBy 'name'}}is-sorting{{/if}}" data-sort="name">
 								<div class="table-fake-th"><span>{{_ "Name"}}</span> {{> icon icon=(sortIcon 'name') }}</div>
 							</th>
-							<th class="directory__owner js-sort {{#if searchSortBy 'owner'}}is-sorting{{/if}}" data-sort="owner">
-								<div class="table-fake-th"><span>{{_ "Owner"}}</span> {{> icon icon=(sortIcon 'owner') }}</div>
+							<th class="directory__creator js-sort {{#if searchSortBy 'creator'}}is-sorting{{/if}}" data-sort="creator">
+								<div class="table-fake-th"><span>{{_ "Creator"}}</span> {{> icon icon=(sortIcon 'creator') }}</div>
 							</th>
 							<th class="directory__user-count js-sort {{#if searchSortBy 'users'}}is-sorting{{/if}}" data-sort="users">
 								<div class="table-fake-th"><span>{{_ "Users"}}</span> {{> icon icon=(sortIcon 'users') }}</div>
@@ -199,7 +199,7 @@
 										</div>
 									</div>
 								</td>
-								<td>{{owner}}</td>
+								<td>{{creator}}</td>
 								<td>{{users}}</td>
 								<td>{{createdAt}}</td>
 							</tr>

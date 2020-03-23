@@ -74,14 +74,14 @@ Template.membersList.helpers({
 			if(user.team) {
 				const tempUser = user;
 				tempUser.status = status;
-				if (teams.filter(e => e.teamName === user.team).length > 0) {
+				if (teams.filter(e => e.teamName === user.team.name).length > 0) {
 					teams.forEach(function(item) {
-						if (item.teamName === user.team) {
+						if (item.teamName === user.team.name) {
 							item.users.push(tempUser);
 						}
 					});
 				} else {
-					teams.push({teamName: user.team, users: [tempUser]});
+					teams.push({teamName: user.team.name, users: [tempUser]});
 				}
 			}
 
@@ -100,6 +100,9 @@ Template.membersList.helpers({
 			users = users.filter(e => !e.status.includes('offline'));
 			teams.forEach((team) => team.users = team.users.filter((u) => !u.status.includes('offline')));
 		}
+
+		// Filter out team users from
+		users = users.filter((e) => !e.user.team);
 
 		const usersTotal = users.length;
 		const { total, loading, usersLimit, loadingMore } = Template.instance();

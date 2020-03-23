@@ -4,7 +4,6 @@ import { Random } from 'meteor/random';
 import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
 
 import { Rooms, Subscriptions, Users, Teams } from '../../../models';
-//import { Teams } from '../../../models/server/raw'
 import { hasPermission } from '../../../authorization';
 import { addTeamUserToRoom } from '../functions';
 import { Notifications } from '../../../notifications';
@@ -65,7 +64,7 @@ Meteor.methods({
 		const user = Meteor.user();
 		const teams = data.teams;
 		teams.forEach((teamname) => {
-			team = Teams.findByNameOrNameRegex(teamname, {})[0];
+			team = Teams.findByNameOrNameRegex(teamname.name, {})[0];
 			
 			if (!team) {
 				// TODO: fix error message.

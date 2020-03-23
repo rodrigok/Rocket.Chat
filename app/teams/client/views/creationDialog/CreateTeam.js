@@ -75,7 +75,8 @@ Template.CreateTeam.events({
 
 		const result = await call('createTeam', { owner, t_name, users });
 
-		roomTypes.openRouteLink(result.t, result);
+		//Strange, but this closes the window.
+		this.onCreate();
 	},
 });
 

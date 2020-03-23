@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Rooms, Subscriptions, Messages } from '../../../models';
 import { callbacks } from '../../../callbacks';
 
-export const addTeamUserToRoom = function(rid, user, inviter, teamName, silenced) {
+export const addTeamUserToRoom = function(rid, user, inviter, team, silenced) {
 	const now = new Date();
 	const room = Rooms.findOneById(rid);
 
@@ -25,7 +25,7 @@ export const addTeamUserToRoom = function(rid, user, inviter, teamName, silenced
 		ts: now,
 		open: true,
         alert: true,
-        team: teamName,
+        team: team,
 		unread: 1,
 		userMentions: 1,
 		groupMentions: 0,

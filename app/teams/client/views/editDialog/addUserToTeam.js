@@ -102,7 +102,7 @@ Template.addUserToTeam.events({
 		let users = instance.selectedUsers.get();
 		users.forEach((user) => { delete user.status });
 
-		Meteor.call('addUsersToTeam', users, this.team, function(err) {
+		Meteor.call('addUsersToTeam', users, this.teamId, this.teamName, function(err) {
 			if (err) {
 				return toastr.error(err);
 			}

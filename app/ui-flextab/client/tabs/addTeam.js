@@ -100,7 +100,7 @@ Template.addTeam.events({
 		t.userFilter.set(modified);
 	},
 	'click .js-add'(e, instance) {
-		const teams = instance.selectedUsers.get().map(({ name }) => name);
+		const teams = instance.selectedUsers.get();
 
 		Meteor.call('addTeamsToRoom', {
 			rid: Session.get('openedRoom'),

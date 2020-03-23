@@ -94,6 +94,19 @@ export class Subscriptions extends Base {
 		return this.update(query, update);
 	}
 
+	/**
+	 * Find room ids which contain a team.
+	 * @param {*} team Name of team
+	 */
+	findRoomIdsByTeam(team){
+		const query = {
+			'team._id': team,
+		};
+		let result = this.find(query).fetch();
+		result = result.map((subs) => subs['rid']);
+		return result;
+	}
+
 	getAutoTranslateLanguagesByRoomAndNotUser(rid, userId) {
 		const subscriptionsRaw = this.model.rawCollection();
 		const distinct = Meteor.wrapAsync(subscriptionsRaw.distinct, subscriptionsRaw);

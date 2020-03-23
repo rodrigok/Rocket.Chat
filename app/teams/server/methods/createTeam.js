@@ -1,6 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 
 import { settings } from '../../../settings/server';
+import { addTeamUserToRoom } from '../../../lib/server/functions'
+import { removeUserFromRoom } from '../../../lib/server/functions/removeUserFromRoom';
+import { Subscriptions } from '../../../models'
 import Teams from '../../../models/server/models/Teams'
 
 Meteor.methods({
@@ -33,11 +36,41 @@ Meteor.methods({
 				results: result.fetch()
 			};
 		},
-		addUsersToTeam(users, team_id) {
-			return Teams.addUsersToTeam(users, team_id);
+		addUsersToTeam(users, team_id, team_name) {
+			Teams.addUsersToTeam(users, team_id);
+			roomIds = Subscriptions.findRoomIdsByTeam(team_id);
+			users.forEach((user) => {
+				roomIds.forEach((rid) => {
+					const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
+					if (!subscription) {
+						let team = { 
+							_id: team_id, 
+							name: team_name
+						}
+						addTeamUserToRoom(rid, user, team);
+					//} else {
+						// Do we want to notify when a user is already in a room?
+						// Notifications.notifyUser(userId, 'message', {
+						// 	_id: Random.id(),
+						// 	rid: rid,
+						// 	ts: new Date(),
+						// 	msg: TAPi18n.__('Username_is_already_in_here', {
+						// 		postProcess: 'sprintf',
+						// 		sprintf: [user.username],
+						// 	}, user.language),
+						// });
+					}
+				});
+			});
+			return 'success';
 		},
 		removeUserFromTeam(user, team_id) {
-			return Teams.removeUserFromTeam(user, team_id);
+			Teams.removeUserFromTeam(user, team_id);
+			roomIds = Subscriptions.findRoomIdsByTeam(team_id);
+			roomIds.forEach((rid) => {
+				removeUserFromRoom(rid, user);
+			})
+			return 'success';
 		}
 	}
 )

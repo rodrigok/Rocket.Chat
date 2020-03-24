@@ -47,7 +47,7 @@ Meteor.methods({
 							_id: team_id, 
 							name: team_name
 						}
-						addTeamUserToRoom(rid, user, team);
+						addTeamUserToRoom(rid, user, user, team);
 					//} else {
 						// Do we want to notify when a user is already in a room?
 						// Notifications.notifyUser(userId, 'message', {

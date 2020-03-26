@@ -41,25 +41,11 @@ Meteor.methods({
 			roomIds = Subscriptions.findRoomIdsByTeam(team_id);
 			users.forEach((user) => {
 				roomIds.forEach((rid) => {
-					const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
-					if (!subscription) {
-						let team = { 
-							_id: team_id, 
-							name: team_name
-						}
-						addTeamUserToRoom(rid, user, user, team);
-					//} else {
-						// Do we want to notify when a user is already in a room?
-						// Notifications.notifyUser(userId, 'message', {
-						// 	_id: Random.id(),
-						// 	rid: rid,
-						// 	ts: new Date(),
-						// 	msg: TAPi18n.__('Username_is_already_in_here', {
-						// 		postProcess: 'sprintf',
-						// 		sprintf: [user.username],
-						// 	}, user.language),
-						// });
+					let team = { 
+						_id: team_id, 
+						name: team_name
 					}
+					addTeamUserToRoom(rid, user, user, team);
 				});
 			});
 			return 'success';
@@ -68,9 +54,16 @@ Meteor.methods({
 			Teams.removeUserFromTeam(user, team_id);
 			roomIds = Subscriptions.findRoomIdsByTeam(team_id);
 			roomIds.forEach((rid) => {
-				removeUserFromRoom(rid, user);
-			})
+				const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
+				if (subscription.team.filter(e => e._id === team_id).length > 0) {
+					let newTeamField = subscription.team;
+					removeUserFromRoom(rid, user);
+					newTeamField.splice(newTeamField.map(e => e._id).indexOf(team_id), 1);
+					Subscriptions.updateTeamField(subscription._id, newTeamField);
+				}
+			});
 			return 'success';
-		}
+		},
+		removeTeamFromChannel(rid, team) {}
 	}
 )

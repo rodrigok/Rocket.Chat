@@ -10,7 +10,19 @@ export const addTeamUserToRoom = function(rid, user, inviter, team, silenced) {
 	// Check if user is already in room
 	const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 	if (subscription) {
-		return;
+		// Determine if team field is there
+		if(subscription.team) {
+			// and team being added
+			if(subscription.team.find((t) => t.name === team.name)) {
+				return true;
+			}
+			subscription.team.push(team);
+		} else {
+			subscription.team = [team, {inRoom: true}];
+		}
+		Subscriptions.updateTeamField(subscription._id, subscription.team);
+		// Otherwise, append team object to team array
+		return true;
 	}
 
 	if (room.t === 'c' || room.t === 'p') {
@@ -25,7 +37,7 @@ export const addTeamUserToRoom = function(rid, user, inviter, team, silenced) {
 		ts: now,
 		open: true,
         alert: true,
-        team: team,
+        team: [team],
 		unread: 1,
 		userMentions: 1,
 		groupMentions: 0,

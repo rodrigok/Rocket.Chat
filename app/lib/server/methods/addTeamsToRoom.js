@@ -76,19 +76,7 @@ Meteor.methods({
 			members.forEach((user) => {
 				const newUser = Users.findOneByUsernameIgnoringCase(user.username);
 				const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, newUser._id);
-				if (!subscription) {
-					addTeamUserToRoom(data.rid, newUser, user, teamname);
-				} else {
-					Notifications.notifyUser(userId, 'message', {
-						_id: Random.id(),
-						rid: data.rid,
-						ts: new Date(),
-						msg: TAPi18n.__('Username_is_already_in_here', {
-							postProcess: 'sprintf',
-							sprintf: [newUser.username],
-						}, user.language),
-					});
-				}
+				addTeamUserToRoom(data.rid, newUser, user, teamname);
 			})
 		});
 

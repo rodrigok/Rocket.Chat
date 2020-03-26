@@ -74,15 +74,19 @@ Template.membersList.helpers({
 			if(user.team) {
 				const tempUser = user;
 				tempUser.status = status;
-				if (teams.filter(e => e.teamName === user.team.name).length > 0) {
-					teams.forEach(function(item) {
-						if (item.teamName === user.team.name) {
-							item.users.push(tempUser);
+				user.team.forEach((team) => {
+					if (teams.filter(e => e.teamName === team.name).length > 0) {
+						teams.forEach(function(item) {
+							if (item.teamName === team.name) {
+								item.users.push(tempUser);
+							}
+						});
+					} else {
+						if(!team.inRoom) {
+							teams.push({teamName: team.name, users: [tempUser]});
 						}
-					});
-				} else {
-					teams.push({teamName: user.team.name, users: [tempUser]});
-				}
+					}
+				});
 			}
 
 			const muted = (room.ro && !roomUnmuted.includes(user.username)) || roomMuted.includes(user.username);
@@ -102,7 +106,19 @@ Template.membersList.helpers({
 		}
 
 		// Filter out team users from
-		users = users.filter((e) => !e.user.team);
+		users = users.filter((e) => {
+			if(!e.user.team) {
+				return true;
+			} else {
+				let inRoom = false;
+				e.user.team.forEach(f => {
+					if ('inRoom' in f) { inRoom = true; }
+				})
+				if (inRoom) {
+					return true;
+				}
+			}
+		});
 
 		const usersTotal = users.length;
 		const { total, loading, usersLimit, loadingMore } = Template.instance();

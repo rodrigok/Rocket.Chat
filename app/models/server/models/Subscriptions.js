@@ -107,6 +107,17 @@ export class Subscriptions extends Base {
 		return result;
 	}
 
+	updateTeamField(id, team) {
+		const query = {
+			_id: id,
+		};
+		if(team.length < 1) {
+			this.update(query, { $unset: { team: "" } });
+		} else {
+			this.update(query, { $set: { team: team } });
+		}
+	}
+
 	getAutoTranslateLanguagesByRoomAndNotUser(rid, userId) {
 		const subscriptionsRaw = this.model.rawCollection();
 		const distinct = Meteor.wrapAsync(subscriptionsRaw.distinct, subscriptionsRaw);

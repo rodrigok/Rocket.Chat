@@ -5,10 +5,11 @@ export const getActions = ({ user, directActions, hideAdminControls }) => {
 
     const getUser = function getUser(fn, ...args) {
 		user.team = this.data.teamId;
+		const inst = this.view;
 		if (!user) {
 			return;
 		}
-		return fn.apply(this, [user, ...args]);
+		return fn.apply(this, [user, inst, ...args]);
 	};
 
 	const prevent = (fn, ...args) => function(e, { instance }) {
@@ -32,8 +33,9 @@ export const getActions = ({ user, directActions, hideAdminControls }) => {
 			icon: 'sign-out',
 			modifier: 'alert',
 			name: 'Remove from team',
-			action: prevent(getUser, ({ username, team }) => {
-                Meteor.call('removeUserFromTeam', user, team, success(() => toastr.success('This worked!')));
+			action: prevent(getUser, ({ username, team, inst }) => {
+				Meteor.call('removeUserFromTeam', user, team, success(() => toastr.success('This worked!')));
+				//instance.onRendered();
             }),
 			condition: true,
 		}

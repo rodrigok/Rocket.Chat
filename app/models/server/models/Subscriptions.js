@@ -103,18 +103,18 @@ export class Subscriptions extends Base {
 			'team._id': team,
 		};
 		let result = this.find(query).fetch();
-		result = result.map((subs) => subs['rid']);
+		result = [... new Set(result.map((subs) => subs['rid']))];
 		return result;
 	}
 
-	updateTeamField(id, team) {
+	updateTeamField(_id, team) {
 		const query = {
-			_id: id,
+			_id,
 		};
 		if(team.length < 1) {
 			this.update(query, { $unset: { team: "" } });
 		} else {
-			this.update(query, { $set: { team: team } });
+			let result = this.update(query, { $set: { team: team } });
 		}
 	}
 

@@ -15,6 +15,9 @@ Meteor.methods({
 		* @param {string[]} users - Users to be added
 		*/
 		createTeam({ owner, t_name, users }) {
+			if(!users.find((u) => u._id === owner._id)) {
+				users = users.concat(owner);
+			}
 			const team = {
 				name: t_name,
 				creator: owner,
@@ -52,14 +55,18 @@ Meteor.methods({
 		},
 		removeUserFromTeam(user, team_id) {
 			Teams.removeUserFromTeam(user, team_id);
-			roomIds = Subscriptions.findRoomIdsByTeam(team_id);
+			const roomIds = Subscriptions.findRoomIdsByTeam(team_id);
 			roomIds.forEach((rid) => {
 				const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
-				if (subscription.team.filter(e => e._id === team_id).length > 0) {
-					let newTeamField = subscription.team;
-					removeUserFromRoom(rid, user);
-					newTeamField.splice(newTeamField.map(e => e._id).indexOf(team_id), 1);
-					Subscriptions.updateTeamField(subscription._id, newTeamField);
+				if ('team' in subscription) {
+					if (subscription.team.filter(e => e._id === team_id).length > 0) {
+						let newTeamField = subscription.team;
+						newTeamField.splice(newTeamField.map(e => e._id).indexOf(team_id), 1);
+						if(newTeamField.length < 1) {
+							removeUserFromRoom(rid, user);
+						}
+						Subscriptions.updateTeamField(subscription._id, newTeamField);
+					}
 				}
 			});
 			return 'success';

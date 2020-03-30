@@ -88,7 +88,7 @@ Template.EditTeam.events({
 		if (others.length) {
 			groups.push({ items: others });
 		}
-		if (channel.length) {
+		if (channel.length && this.user._id !== Meteor.userId()) {
 			groups.push({ items: channel });
 		}
 

@@ -26,7 +26,7 @@ Meteor.methods({
 		// Get user and room details
 		const room = Rooms.findOneById(data.rid);
 		const userId = Meteor.userId();
-		const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, userId, { fields: { _id: 1 } });
+		const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, userId, { fields: { _id: 1, team: 1 } });
 		const userInRoom = subscription != null;
 
 		// Can't add to direct room ever
@@ -73,15 +73,17 @@ Meteor.methods({
 			if (!subscription) {
 				addUserToRoom(data.rid, newUser, user);
 			} else {
-				Notifications.notifyUser(userId, 'message', {
-					_id: Random.id(),
-					rid: data.rid,
-					ts: new Date(),
-					msg: TAPi18n.__('Username_is_already_in_here', {
-						postProcess: 'sprintf',
-						sprintf: [newUser.username],
-					}, user.language),
-				});
+				if(!'team' in subscription) {
+					Notifications.notifyUser(userId, 'message', {
+						_id: Random.id(),
+						rid: data.rid,
+						ts: new Date(),
+						msg: TAPi18n.__('Username_is_already_in_here', {
+							postProcess: 'sprintf',
+							sprintf: [newUser.username],
+						}, user.language),
+					});
+				}
 			}
 		});
 

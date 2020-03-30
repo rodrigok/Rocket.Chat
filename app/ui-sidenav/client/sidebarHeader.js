@@ -228,7 +228,7 @@ const toolbarButtons = (user) => [{
 									},
 								},
 								{
-									icon: 'team',
+									icon: 'teams',
 									name: t('Team'),
 									action: createTeam,
 								},

@@ -82,11 +82,11 @@ Template.addUserToTeam.events({
 	...acEvents,
 	'click .rc-tags__tag'({ target }, t) {
 		const { username } = Blaze.getData(target);
-		t.selectedUsers.set(t.selectedUsers.get().filter((user) => user.username !== username));
+		t.selectedUsers.set(t.selectedUsers.get());
 	},
 	'click .rc-tags__tag-icon'(e, t) {
 		const { username } = Blaze.getData(t.find('.rc-tags__tag-text'));
-		t.selectedUsers.set(t.selectedUsers.get().filter((user) => user.username !== username));
+		t.selectedUsers.set(t.selectedUsers.get());
 	},
 	'input [name="users"]'(e, t) {
 		const input = e.target;
@@ -127,9 +127,9 @@ Template.addUserToTeam.onRendered(function() {
 
 Template.addUserToTeam.onCreated(function() {
 	this.selectedUsers = new ReactiveVar([]);
-	const filter = { exceptions: [Meteor.user().username].concat(this.selectedUsers.get().map((u) => u.username)) };
+	const filter = { exceptions: [].concat(this.selectedUsers.get().map((u) => u.username)) };
 	Deps.autorun(() => {
-		filter.exceptions = [Meteor.user().username].concat(this.selectedUsers.get().map((u) => u.username));
+		filter.exceptions = [].concat(this.selectedUsers.get().map((u) => u.username));
 	});
 	this.userFilter = new ReactiveVar('');
 

@@ -10,6 +10,9 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 	// Check if user is already in room
 	const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 	if (subscription) {
+		if ('team' in subscription) {
+			Subscriptions.updateTeamField(subscription._id, subscription.team.concat({inRoom: true}));
+		}
 		return;
 	}
 

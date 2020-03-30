@@ -189,7 +189,7 @@ Template.SearchCreateTeam.onCreated(function() {
 	this.onClickTag = this.data.onClickTag;
 	this.deleteLastItem = this.data.deleteLastItem;
 
-	const { collection, endpoint, field, sort, onSelect, selector = (match) => ({ term: match }) } = this.data;
+	const { collection, endpoint, field, sort, onSelect, filter, selector = (match) => ({ term: match }) } = this.data;
 	this.ac = new AutoComplete(
 		{
 			selector: {

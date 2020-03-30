@@ -204,7 +204,7 @@ Template.membersList.events({
 		tabBar.setTemplate('addTeam');
 		tabBar.setData({
 			label: 'Add team',
-			icon: 'team',
+			icon: 'teams',
 		});
 
 		tabBar.open();
@@ -234,10 +234,14 @@ Template.membersList.events({
 		instance.usersLimit.set(100);
 	},
 	'click .js-more'(e, instance) {
+		let user = this.user;
+		if ('user' in this.user) {
+			user = this.user.user;
+		} 
 		e.currentTarget.parentElement.classList.add('active');
 		const room = Session.get(`roomData${ instance.data.rid }`);
 		const _actions = getActions({
-			user: this.user.user,
+			user: user,
 			hideAdminControls: roomTypes.roomTypes[room.t].userDetailShowAdmin(room) || false,
 			directActions: roomTypes.roomTypes[room.t].userDetailShowAll(room) || false,
 		})
@@ -247,12 +251,17 @@ Template.membersList.events({
 		const columns = [];
 		const admin = _actions.filter((action) => action.group === 'admin');
 		const others = _actions.filter((action) => !action.group);
+		//const channel = _actions.filter((actions) => actions.group === 'channel');
 		const channel = _actions.filter((actions) => actions.group === 'channel');
 		if (others.length) {
 			groups.push({ items: others });
 		}
 		if (channel.length) {
-			groups.push({ items: channel });
+			if (!this.user.user) {
+				groups.push({ items: channel.filter((a) => a.name !== 'Remove from room')})
+			} else {
+				groups.push({ items: channel });
+			}
 		}
 
 		if (admin.length) {

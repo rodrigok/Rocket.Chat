@@ -58,14 +58,17 @@ Meteor.methods({
 			const roomIds = Subscriptions.findRoomIdsByTeam(team_id);
 			roomIds.forEach((rid) => {
 				const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
-				if ('team' in subscription) {
-					if (subscription.team.filter(e => e._id === team_id).length > 0) {
-						let newTeamField = subscription.team;
-						newTeamField.splice(newTeamField.map(e => e._id).indexOf(team_id), 1);
-						if(newTeamField.length < 1) {
-							removeUserFromRoom(rid, user);
+				if (subscription){
+					if ('team' in subscription) {
+						if (subscription.team.filter(e => e._id === team_id).length > 0) {
+							let newTeamField = subscription.team;
+							newTeamField.splice(newTeamField.map(e => e._id).indexOf(team_id), 1);
+							if(newTeamField.length < 1) {
+								removeUserFromRoom(rid, user);
+							} else {
+								Subscriptions.updateTeamField(subscription._id, newTeamField);
+							}
 						}
-						Subscriptions.updateTeamField(subscription._id, newTeamField);
 					}
 				}
 			});

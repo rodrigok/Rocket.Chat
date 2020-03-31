@@ -38,7 +38,7 @@ Meteor.methods({
 
 		const fromUser = Users.findOneById(fromId);
 
-		const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, removedUser._id, { fields: { _id: 1 } });
+		const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, removedUser._id, { fields: { _id: 1, team: 1 } });
 		if (!subscription) {
 			throw new Meteor.Error('error-user-not-in-room', 'User is not in this room', {
 				method: 'removeUserFromRoom',
@@ -52,6 +52,15 @@ Meteor.methods({
 				throw new Meteor.Error('error-you-are-last-owner', 'You are the last owner. Please set new owner before leaving the room.', {
 					method: 'removeUserFromRoom',
 				});
+			}
+		}
+
+		if ('team' in subscription) {
+			// Are we in a team in this room?
+			if (subscription.team.find((e) => e._id)) {
+				let newTeamField = subscription.team.filter((e) => !e.inRoom);
+				Subscriptions.updateTeamField(subscription._id, newTeamField);
+				return true;
 			}
 		}
 

@@ -29,9 +29,9 @@ Meteor.methods({
 			Teams.addTeam(team)
 			return 'Success'
 		},
-		searchTeams(t_name) {
+		searchTeams(t_id) {
 			const query = {
-				name: t_name
+				_id: t_id,
 			}
 			result = Teams.find(query);
 			return {

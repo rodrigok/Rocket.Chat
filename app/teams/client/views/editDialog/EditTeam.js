@@ -8,8 +8,8 @@ import { Subscriptions } from '../../../../models'
 
 import './EditTeam.html';
 
-function teamSearch(user, teamName, cb) {
-    return Meteor.call('searchTeams', teamName, (err, result) => {
+function teamSearch(user, teamId, cb) {
+    return Meteor.call('searchTeams', teamId, (err, result) => {
         cb(result);
         return result;
     });
@@ -62,11 +62,12 @@ Template.EditTeam.helpers({
         //return hasPermission('create-invite-links', this._id);
         return true;
 	},
-	canAddUser() {
-		// const roomData = Session.get(`roomData${ this._id }`);
-		// if (!roomData) { return ''; }
-        // return (() => roomTypes.roomTypes[roomData.t].canAddUser(roomData))();
-        return true;
+	canEditTeam() {
+		if (this.canEdit) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 });
 
@@ -148,7 +149,7 @@ Template.EditTeam.events({
 Template.EditTeam.onRendered(function () {
     this.autorun(() => {
         let name;
-        teamSearch(Meteor.user()._id, this.data.teamName, (results) => {
+        teamSearch(Meteor.user()._id, this.data.teamId, (results) => {
             team = results.results[0];
             this.data.teamOwner.set(team.owner);
             this.data.teamMembers.set(team.members);
@@ -159,7 +160,7 @@ Template.EditTeam.onRendered(function () {
 });
 
 Template.EditTeam.onCreated(function(){
-    this.data.teamId = new ReactiveVar('');
+    //this.data.teamId = new ReactiveVar('');
     this.data.teamOwner = new ReactiveVar('');
     this.data.teamUsercount = new ReactiveVar(0);
     this.data.teamMembers = new ReactiveVar([]);

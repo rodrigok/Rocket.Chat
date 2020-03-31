@@ -16,7 +16,17 @@ export class Teams extends Base {
     }
 
     findMyTeams(user) {
-        return this._db.find({owner: { $elemMatch: { _id: user._id }}});
+        return this._db.find({
+            $or: [{
+                owner: {
+                    $elemMatch: { _id: user._id }
+                }
+                }, {
+                    members: {
+                        $elemMatch: { _id: user._id }
+                    }
+                }]
+            });
     }
 
     /**

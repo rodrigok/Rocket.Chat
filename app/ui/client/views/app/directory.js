@@ -44,9 +44,11 @@ function directorySearch(config, cb) {
 
 			if (config.type === 'teams') {
 				return {
+					_id: result._id,
 					name: result.name,
 					creator: result.creator.username,
 					users: result.usersCount,
+					canEdit: result.owner.find(e => e._id === Meteor.user()._id),
 					createdAt: timeAgo(result.ts, t),
 				};
 			}
@@ -177,6 +179,8 @@ Template.directory.helpers({
 							modal.close();
 						},
 						teamName: item.name,
+						teamId: item._id,
+						canEdit: item.canEdit,
 					},
 					modifier: 'modal',
 					showConfirmButton: false,

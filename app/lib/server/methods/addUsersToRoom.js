@@ -83,6 +83,8 @@ Meteor.methods({
 							sprintf: [newUser.username],
 						}, user.language),
 					});
+				} else {
+					Subscriptions.updateTeamField(subscription._id, subscription.team.concat({inRoom: true}));
 				}
 			}
 		});

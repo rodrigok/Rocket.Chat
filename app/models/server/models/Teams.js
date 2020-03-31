@@ -35,9 +35,16 @@ export class Teams extends Base {
      * @param {*} team_id ID for team
      */
     addUsersToTeam(user, team_id) {
+        const count = user.length;
         const query = {
             _id: team_id,
         };
+
+        const updateCount = {
+            $inc: {
+                usersCount: count,
+            }
+        }
 
         let update = {
             $push: {
@@ -45,6 +52,8 @@ export class Teams extends Base {
             }
         };
         let result = this.update(query, update);
+        this.update(query, updateCount);
+
         return result;
     }
 
@@ -58,6 +67,12 @@ export class Teams extends Base {
             _id: team_id,
         };
 
+        const updateCount = {
+            $inc: {
+                usersCount: 1,
+            }
+        }
+
         let update = {
             $pull: {
                 members: {
@@ -65,7 +80,9 @@ export class Teams extends Base {
                 }
             }
         };
-        return this.update(query, update);
+        const result = this.update(query, update);
+        this.update(query, updateCount);
+        return result;
     }
 
     findByNameOrNameRegex(searchTerm, options) {

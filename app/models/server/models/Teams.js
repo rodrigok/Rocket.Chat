@@ -69,7 +69,7 @@ export class Teams extends Base {
 
         const updateCount = {
             $inc: {
-                usersCount: 1,
+                usersCount: -1,
             }
         }
 

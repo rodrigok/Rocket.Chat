@@ -10,12 +10,7 @@
 
             </div>
         </form>
-
-        {{#unless loading}}
-            <div class="rc-user-info__row rc-user-info__row--separator">
-                <div class="rc-member-list__counter">{{{_ "Showing_online_users" total_showing=totalShowing online=totalOnline total=total}}}</div>
-            </div>
-        {{/unless}}
+        
         <div class="flex-tab__result list-view">
             {{#if loading}}
                 {{> loading}}
@@ -23,10 +18,10 @@
                 <ul class='list clearfix lines'>
                     {{#each getTeamMembers}}
                         <li class='rc-member-list__user'>
-                            {{> avatar username=username}}
+                            {{> avatar username=name}}
                             <div class="rc-member-list__username">
                                 <div class="rc-member-list__status rc-member-list__status--{{status}}"></div>
-                                {{ignored}} {{username}} {{utcOffset}}
+                                {{ignored}} {{name}} {{utcOffset}}
                                 </div>
                             {{> icon user=. block="rc-member-list__menu js-more" icon="menu" }}
                         </li>

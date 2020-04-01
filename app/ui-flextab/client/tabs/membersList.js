@@ -180,6 +180,10 @@ Template.membersList.helpers({
 		return this.user.username;
 	},
 	displayTeam() {
+		if (settings.get('UI_Use_Real_Name') && this.name) {
+			return this.name;
+		}
+
 		return this.username;
 	},
 	loadingMore() {

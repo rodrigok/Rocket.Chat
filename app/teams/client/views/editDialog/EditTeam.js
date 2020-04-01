@@ -89,7 +89,7 @@ Template.EditTeam.events({
 		if (others.length) {
 			groups.push({ items: others });
 		}
-		if (channel.length && this.user._id !== Meteor.userId()) {
+		if (channel.length && this.user._id !== Meteor.userId() && instance.data.canEdit) {
 			groups.push({ items: channel });
 		}
 

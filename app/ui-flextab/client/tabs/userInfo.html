@@ -63,12 +63,6 @@
 								</div>
 							{{/if}}
 							{{#if hasPermission 'view-full-other-user-info'}}
-								{{#if hasEmails}}
-									<div class="rc-user-info-details__item">
-										<label class="rc-user-info-details__label">{{_ "Email"}}</label>
-										{{#each emails}} <a href="mailto:{{address}}" class="rc-user-info-details__info">{{address}}{{#if verified}}&nbsp;<i class="icon-ok success-color"></i>{{/if}}</a> {{/each}}
-									</div>
-								{{/if}}
 								{{#if hasPhone}}
 									<div class="rc-user-info-details__item">
 										<label class="rc-user-info-details__label">{{_ "Phone_number"}}</label>

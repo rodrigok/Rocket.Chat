@@ -36,10 +36,16 @@ Template.userInfo.helpers({
 	moreActions,
 
 	actions() {
-		return Template.instance().actions.get()
+	//	if(Template.instance().actions.get() === t('Block_User')){
+			return Template.instance().actions.get()
 			.map((action) => (typeof action === 'function' ? action.call(this) : action))
 			.filter((action) => action && (!action.condition || action.condition.call(this)))
 			.slice(0, shownActionsCount);
+		//}
+		/*return Template.instance().actions.get()
+			.map((action) => (typeof action === 'function' ? action.call(this) : action))
+			.filter((action) => action && (!action.condition || action.condition.call(this)))
+			.slice(0, shownActionsCount);*/
 	},
 
 	customField() {

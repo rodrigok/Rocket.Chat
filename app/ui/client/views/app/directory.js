@@ -164,6 +164,7 @@ Template.directory.helpers({
 							modal.close();
 						},
 						username: item.username,
+						fromDirectory: true,
 					},
 					modifier: 'modal',
 					showConfirmButton: false,

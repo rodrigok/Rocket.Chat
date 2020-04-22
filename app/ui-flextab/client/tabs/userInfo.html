@@ -37,7 +37,7 @@
 							</span>
 						</div>
 
-						<div class="rc-user-info-action">
+						<!-- --><div class="rc-user-info-action">
 							{{#each actions}}
 								<button class="js-action rc-user-info-action__item">
 									{{> icon block="rc-user-info-action__icon" icon=icon }}
@@ -49,10 +49,10 @@
 									{{> icon block="tab-button-icon" icon="menu" }}
 								</button>
 							{{/with}}
-						</div>
+						</div><!---->
 
 						<div class="rc-user-info-details">
-							{{#if roleTags}}
+							<!--{{#if roleTags}}
 								<div class="rc-user-info-details__item">
 									<label class="rc-user-info-details__label">{{_ "Roles"}}</label>
 									<ul class="chip-container current-user-roles">
@@ -61,7 +61,7 @@
 										{{/each}}
 									</ul>
 								</div>
-							{{/if}}
+							{{/if}}-->
 							{{#if hasPermission 'view-full-other-user-info'}}
 								{{#if hasPhone}}
 									<div class="rc-user-info-details__item">
@@ -69,7 +69,7 @@
 										{{#each phone}} <a href="tel:{{phoneNumber}}" class="rc-user-info-details__info">{{phoneNumber}}</a> {{/each}}
 									</div>
 								{{/if}}
-								{{#if createdAt}}
+								<!--{{#if createdAt}}
 									<div class="rc-user-info-details__item">
 										<label class="rc-user-info-details__label">{{_ "Created_at"}}</label>
 										<p class="rc-user-info-details__info">{{createdAt}}</p>
@@ -77,8 +77,8 @@
 									<div class="rc-user-info-details__item">
 										<label class="rc-user-info-details__label">{{_ "Last_login"}}</label>
 										<p class="rc-user-info-details__info">{{lastLogin}}</p>
-									</div>
-								{{/if}}
+									</div>-
+								{{/if}}-->
 								{{#if shouldDisplayReason}}
 									<div class="rc-user-info-details__item">
 										<label class="rc-user-info-details__label">{{_ "Reason_To_Join"}}</label>
@@ -86,12 +86,12 @@
 									</div>
 								{{/if}}
 							{{/if}}
-							{{#if utc}}
+							<!--{{#if utc}}
 								<div class="rc-user-info-details__item">
 									<label class="rc-user-info-details__label">{{_ "Timezone"}}</label>
 									<p class="rc-user-info-details__info">{{userTime}} (UTC {{utc}})</p>
 								</div>
-							{{/if}}
+							{{/if}}-->
 							{{#each customField}}
 								<div class="rc-user-info-details__item">
 									<label class="rc-user-info-details__label">{{label}}</label>

@@ -413,7 +413,7 @@ export const getActions = ({ user, directActions, hideAdminControls }) => {
 				})));
 			}),
 			condition: () => directActions && canRemoveUser(),
-		}, /*{
+		}, {
 			icon: 'edit',
 			name: 'Edit',
 			group: 'admin',
@@ -421,7 +421,7 @@ export const getActions = ({ user, directActions, hideAdminControls }) => {
 			action: prevent(getUser, function(user) {
 				this.editingUser.set(user._id);
 			}),
-		}, */{
+		}, {
 			icon: 'trash',
 			name: 'Delete',
 			action: prevent(getUser, ({ _id }) => {
